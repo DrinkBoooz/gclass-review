@@ -34,9 +34,12 @@ import os
 import sys
 import time
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
+import asyncio
+from local_pipeline import run_local_queue
 from rich.console import Console
 from rich.table import Table
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
@@ -55,6 +58,8 @@ from classroom_handler import (
 from gemini_grader import (
     build_gemini_client,
     load_rubric,
+    load_system_prompt,
+    build_cached_prefix,
     grade_submission,
 )
 
@@ -87,7 +92,7 @@ def load_and_validate_env() -> dict:
         SystemExit: If any required variable is missing or MAX_SCORE is not
                     a valid integer.
     """
-    load_dotenv()
+    load_dotenv(override=True)
 
     required_vars = [
         "GEMINI_API_KEY",
@@ -129,6 +134,7 @@ def load_and_validate_env() -> dict:
         "max_score":         max_score,
         "assignment_title":  os.getenv("ASSIGNMENT_TITLE"),
         "rubric_file":       os.getenv("RUBRIC_FILE", "rubric.md"),
+        "system_prompt_file": os.getenv("SYSTEM_PROMPT_FILE", "activity-checker-v4-fixed.md"),
     }
 
 
@@ -142,6 +148,11 @@ def parse_args() -> argparse.Namespace:
         description="Automated AI Grading Pipeline — Google Classroom × Gemini 3 Flash",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
+    )
+    parser.add_argument(
+        "--menu",
+        action="store_true",
+        help="Open interactive CLI menu to choose grading options.",
     )
     parser.add_argument(
         "--dry-run",
@@ -158,9 +169,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--delay",
         type=float,
-        default=2.0,
+        default=12.0,
         metavar="SECONDS",
-        help="Seconds to wait between Gemini API calls (default: 2.0).",
+        help="Seconds to wait between Gemini API calls (default: 12.0).",
     )
     parser.add_argument(
         "--thinking",
@@ -169,11 +180,179 @@ def parse_args() -> argparse.Namespace:
         help="Gemini 3 thinking level (default: medium). Use 'low' for speed, 'high' for complex rubrics.",
     )
     parser.add_argument(
+        "--rubric",
+        type=str,
+        default=None,
+        metavar="PATH",
+        help="Override the rubric file path (PDF/DOCX/MD/TXT).",
+    )
+    parser.add_argument(
+        "--csv-only",
+        action="store_true",
+        help="Skip posting grades and write the CSV only.",
+    )
+    parser.add_argument(
         "--verbose",
         action="store_true",
         help="Enable DEBUG-level logging.",
     )
     return parser.parse_args()
+
+
+def _prompt_input(prompt: str, default: Optional[str] = None) -> str:
+    if default is not None and default != "":
+        value = input(f"{prompt} [{default}]: ").strip()
+        return value if value else str(default)
+    return input(f"{prompt}: ").strip()
+
+
+def _prompt_bool(prompt: str, default: bool) -> bool:
+    suffix = "Y/n" if default else "y/N"
+    value = input(f"{prompt} ({suffix}): ").strip().lower()
+    if not value:
+        return default
+    return value in ("y", "yes", "1", "true")
+
+
+def _prompt_int(prompt: str, default: Optional[int]) -> Optional[int]:
+    default_text = "none" if default is None else str(default)
+    value = _prompt_input(prompt, default_text).strip().lower()
+    if value in ("", "none", "null", "0"):
+        return None
+    try:
+        return int(value)
+    except ValueError:
+        return default
+
+
+def _prompt_float(prompt: str, default: float) -> float:
+    value = _prompt_input(prompt, f"{default:.1f}").strip()
+    try:
+        return float(value)
+    except ValueError:
+        return default
+
+
+def _prompt_choice(prompt: str, choices: list[str], default: str) -> str:
+    value = _prompt_input(prompt, default).strip().lower()
+    if not value:
+        return default
+    if value in choices:
+        return value
+    return default
+
+
+def _select_rubric_file(current_path: str) -> str:
+    rubric_dir = Path("rubric")
+    candidates: list[Path] = []
+    if rubric_dir.exists():
+        for path in sorted(rubric_dir.iterdir()):
+            if path.suffix.lower() in (".pdf", ".docx", ".md", ".txt"):
+                candidates.append(path)
+
+    console.print("\n[bold]Rubric selection[/bold]")
+    if candidates:
+        for idx, path in enumerate(candidates, start=1):
+            console.print(f"  {idx}) {path}")
+        console.print("  M) Enter path manually")
+        console.print(f"  Enter to keep current: {current_path}")
+        choice = input("Choose rubric: ").strip().lower()
+        if not choice:
+            return current_path
+        if choice == "m":
+            return _prompt_input("Rubric path", current_path).strip('"')
+        if choice.isdigit():
+            idx = int(choice)
+            if 1 <= idx <= len(candidates):
+                return str(candidates[idx - 1])
+    else:
+        console.print("No files found in ./rubric. Enter a path manually.")
+
+    return _prompt_input("Rubric path", current_path).strip('"')
+
+
+def _select_course_id(service, current_id: str) -> str:
+    resp = service.courses().list(pageSize=200).execute()
+    courses = resp.get("courses", [])
+    if not courses:
+        console.print("No courses found for the authorized account.")
+        return current_id
+
+    console.print("\n[bold]Course selection[/bold]")
+    for idx, course in enumerate(courses, start=1):
+        name = course.get("name", "(no name)")
+        section = course.get("section") or ""
+        course_id = course.get("id", "")
+        suffix = f" — {section}" if section else ""
+        console.print(f"  {idx}) {name}{suffix} [{course_id}]")
+
+    choice = input("Choose course (Enter to keep current): ").strip()
+    if not choice:
+        return current_id
+    if choice.isdigit():
+        idx = int(choice)
+        if 1 <= idx <= len(courses):
+            return courses[idx - 1].get("id", current_id)
+    return current_id
+
+
+def _select_coursework_id(service, course_id: str, current_id: str) -> tuple[str, str]:
+    if not course_id:
+        return current_id, ""
+
+    results = service.courses().courseWork().list(courseId=course_id).execute()
+    assignments = results.get("courseWork", [])
+    if not assignments:
+        console.print(f"No assignments found for course ID {course_id}.")
+        return current_id, ""
+
+    console.print("\n[bold]Coursework selection[/bold]")
+    for idx, assignment in enumerate(assignments, start=1):
+        title = assignment.get("title", "(no title)")
+        work_id = assignment.get("id", "")
+        console.print(f"  {idx}) {title} [{work_id}]")
+
+    choice = input("Choose coursework (Enter to keep current): ").strip()
+    if not choice:
+        return current_id, ""
+    if choice.isdigit():
+        idx = int(choice)
+        if 1 <= idx <= len(assignments):
+            selected = assignments[idx - 1]
+            return selected.get("id", current_id), selected.get("title", "")
+    return current_id, ""
+
+
+def run_cli_menu(args: argparse.Namespace, config: dict) -> None:
+    console.print("\n[bold]CLI grading menu[/bold]")
+    if _prompt_bool("Fetch courses from Google Classroom", False):
+        try:
+            service, _ = authenticate_classroom(
+                credentials_file=config["credentials_file"],
+                token_file=config["token_file"],
+            )
+            config["course_id"] = _select_course_id(service, config.get("course_id", ""))
+            coursework_id, coursework_title = _select_coursework_id(
+                service, config.get("course_id", ""), config.get("coursework_id", "")
+            )
+            config["coursework_id"] = coursework_id
+            config["coursework_title"] = coursework_title
+        except Exception as exc:
+            console.print(f"[bold red]Failed to fetch courses:[/bold red] {exc}")
+            config["course_id"] = _prompt_input("Course ID", config.get("course_id", ""))
+            config["coursework_id"] = _prompt_input("Coursework ID", config.get("coursework_id", ""))
+            config["coursework_title"] = config.get("coursework_title", "")
+    else:
+        config["course_id"] = _prompt_input("Course ID", config.get("course_id", ""))
+        config["coursework_id"] = _prompt_input("Coursework ID", config.get("coursework_id", ""))
+        config["coursework_title"] = config.get("coursework_title", "")
+    args.csv_only = _prompt_bool("CSV-only mode (no posting, write CSV)", args.csv_only)
+    args.limit = _prompt_int("Limit submissions", args.limit)
+    args.delay = _prompt_float("Delay between Gemini calls (seconds)", args.delay)
+    args.thinking = _prompt_choice("Thinking level (minimal/low/medium/high)", ["minimal", "low", "medium", "high"], args.thinking)
+
+    config["rubric_file"] = _select_rubric_file(config.get("rubric_file", "rubric.md"))
+    config["system_prompt_file"] = "activity-checker-v4-fixed.md"
 
 
 # ---------------------------------------------------------------------------
@@ -272,13 +451,21 @@ def main() -> None:
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
 
+    if not args.dry_run and not args.csv_only:
+        args.csv_only = True
+
     # ── Banner ────────────────────────────────────────────────────────────────
     console.print(Panel.fit(
         "[bold blue]Automated AI Grading Pipeline[/bold blue]\n"
         "[dim]Google Classroom × Gemini 3 Flash Preview[/dim]",
         border_style="blue",
     ))
-    if args.dry_run:
+    if args.csv_only:
+        console.print(
+            "[bold yellow]⚠ CSV-ONLY MODE — "
+            "No grades will be posted; CSV will be written.[/bold yellow]\n"
+        )
+    elif args.dry_run:
         console.print(
             "[bold yellow]⚠ DRY RUN MODE — "
             "No grades will be posted and no CSV will be written.[/bold yellow]\n"
@@ -286,6 +473,13 @@ def main() -> None:
 
     # ── 1. Load config ────────────────────────────────────────────────────────
     config = load_and_validate_env()
+    config["csv_only"] = args.csv_only
+
+    if args.menu:
+        run_cli_menu(args, config)
+
+    if args.rubric:
+        config["rubric_file"] = args.rubric
 
     # ── 2. Authenticate with Classroom ────────────────────────────────────────
     console.print("[bold]Step 1:[/bold] Authenticating with Google Classroom API...")
@@ -308,7 +502,22 @@ def main() -> None:
     # ── 4. Load rubric ────────────────────────────────────────────────────────
     console.print("[bold]Step 3:[/bold] Loading grading rubric...")
     rubric = load_rubric(config["rubric_file"])
+    config["rubric_text"] = rubric
     console.print(f"  [green]✓[/green] Rubric loaded ({len(rubric)} chars).\n")
+
+    console.print("[bold]Step 3b:[/bold] Loading Gemini system prompt...")
+    system_prompt = load_system_prompt(config.get("system_prompt_file", ""))
+    config["system_prompt"] = system_prompt
+    console.print(f"  [green]✓[/green] System prompt loaded ({len(system_prompt)} chars).\n")
+
+    console.print("[bold]Step 3c:[/bold] Building cached prompt prefix...")
+    rubric_label = Path(config.get("rubric_file", "")).stem
+    cached_name = build_cached_prefix(gemini_client, rubric, system_prompt, rubric_label)
+    config["cached_content_name"] = cached_name
+    if cached_name:
+        console.print("  [green]✓[/green] Cached prefix ready.\n")
+    else:
+        console.print("  [yellow]![/yellow] Cached prefix not available; using full prompts.\n")
 
     # ── 5. Fetch submissions ──────────────────────────────────────────────────
     console.print("[bold]Step 4:[/bold] Fetching TURNED_IN submissions from Classroom...")
@@ -321,6 +530,18 @@ def main() -> None:
     except Exception as e:
         console.print(f"[bold red]Failed to fetch submissions:[/bold red] {e}")
         sys.exit(1)
+
+    if not config.get("coursework_title"):
+        try:
+            coursework = (
+                classroom_service.courses()
+                .courseWork()
+                .get(courseId=config["course_id"], id=config["coursework_id"])
+                .execute()
+            )
+            config["coursework_title"] = coursework.get("title", "")
+        except Exception as e:
+            logger.warning("Could not fetch coursework title: %s", e)
 
     if not submissions:
         console.print("[yellow]No TURNED_IN submissions found. Nothing to grade.[/yellow]")
@@ -342,109 +563,45 @@ def main() -> None:
     results: list[dict] = []
     start_time = datetime.now()
 
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
-        TaskProgressColumn(),
-        console=console,
-    ) as progress:
-        task = progress.add_task("Grading submissions...", total=len(submissions))
+    # ── 6. Grade each submission (Async Local Queue) ──────────────────────
+    console.print(f"[bold]Step 5:[/bold] Grading {len(submissions)} submission(s)...\n")
+    start_time = datetime.now()
 
-        for i, submission in enumerate(submissions, start=1):
-            submission_id = submission.get("id")
-            user_id = submission.get("userId")
+    # Propagate CLI overrides into the config for the local pipeline
+    config["thinking_level"] = args.thinking
 
-            # ── a. Student profile ────────────────────────────────────────
-            progress.update(task, description=f"[{i}/{len(submissions)}] Fetching profile...")
-            profile = get_student_profile(classroom_service, config["course_id"], user_id)
+    # Force dry_run to True to skip Classroom 403 errors and reduce overhead
+    # We will rely on the CSV file for the final grades.
+    is_local = "localhost" in os.getenv("AI_ENDPOINT", "") or os.getenv("GEMINI_API_KEY", "") == "gemini-3.5-flash"
+    base_delay = 1.0 if is_local else args.delay
 
-            result_entry: dict = {
-                "submission_id": submission_id,
-                "user_id":       user_id,
-                "name":          profile["name"],
-                "email":         profile["email"],
-                "max_score":     config["max_score"],
-            }
+    run_dry = args.dry_run or args.csv_only
+    results, cost_report = asyncio.run(
+        run_local_queue(
+            submissions=submissions,
+            config=config,
+            classroom_service=classroom_service,
+            drive_service=drive_service,
+            gemini_client=gemini_client,
+            dry_run=run_dry,
+            max_concurrency=1,    # Keep at 1 so the GPU focuses on one student
+            base_delay=base_delay,
+            output_dir=".",
+        )
+    )
 
-            logger.info(
-                "\n─── Submission %d/%d: %s ───",
-                i, len(submissions), profile["name"]
-            )
-
-            # ── b. Extract attachment content ─────────────────────────────
-            progress.update(
-                task, description=f"[{i}/{len(submissions)}] Extracting: {profile['name']}..."
-            )
-            student_content = collect_submission_content(submission, drive_service)
-
-            if student_content.startswith("[NO ATTACHMENTS") or \
-               student_content.startswith("[COULD NOT EXTRACT"):
-                logger.warning("  Skipping %s — no usable content.", profile["name"])
-                result_entry["status"] = "skipped_no_content"
-                results.append(result_entry)
-                progress.advance(task)
-                continue
-
-            # ── c. AI grading ─────────────────────────────────────────────
-            progress.update(
-                task, description=f"[{i}/{len(submissions)}] Grading: {profile['name']}..."
-            )
-            grading_result = grade_submission(
-                client=gemini_client,
-                assignment_title=config["assignment_title"],
-                rubric=rubric,
-                student_name=profile["name"],
-                student_content=student_content,
-                max_score=config["max_score"],
-                thinking_level=args.thinking,
-            )
-
-            if grading_result is None:
-                logger.error("  Grading failed for %s.", profile["name"])
-                result_entry["status"] = "grading_failed"
-                results.append(result_entry)
-                progress.advance(task)
-                continue
-
-            result_entry["score"]    = grading_result["score"]
-            result_entry["feedback"] = grading_result["feedback"]
-
-            # ── d. Post draft grade to Classroom ──────────────────────────
-            if not args.dry_run:
-                progress.update(
-                    task, description=f"[{i}/{len(submissions)}] Posting: {profile['name']}..."
-                )
-                posted = post_draft_grade(
-                    service=classroom_service,
-                    course_id=config["course_id"],
-                    coursework_id=config["coursework_id"],
-                    submission_id=submission_id,
-                    score=grading_result["score"],
-                    max_score=config["max_score"],
-                )
-                result_entry["status"] = "graded" if posted else "posting_failed"
-            else:
-                result_entry["status"] = "dry_run"
-                logger.info(
-                    "  [DRY RUN] score=%d, feedback preview: %s...",
-                    grading_result["score"],
-                    grading_result["feedback"][:100],
-                )
-
-            results.append(result_entry)
-            progress.advance(task)
-
-            # Pace Gemini calls to stay within rate limits
-            if i < len(submissions):
-                time.sleep(args.delay)
+    console.print(f"[dim]⏱ Pipeline completed in {(datetime.now() - start_time).total_seconds():.1f}s[/dim]\n")
 
     # ── 7. Save feedback CSV ──────────────────────────────────────────────────
     csv_path: Optional[str] = None
-    if not args.dry_run and any(r.get("feedback") for r in results):
+    if (args.csv_only or not args.dry_run) and any(r.get("feedback") for r in results):
         console.print("\n[bold]Step 6:[/bold] Saving feedback to CSV...")
         try:
-            csv_path = save_feedback_to_csv(results, output_dir=".")
+            csv_path = save_feedback_to_csv(
+                results,
+                output_dir=".",
+                coursework_title=config.get("coursework_title", ""),
+            )
             console.print(f"  [green]✓[/green] Saved to: [bold]{csv_path}[/bold]\n")
         except RuntimeError as e:
             console.print(f"  [bold red]✗ CSV save failed:[/bold red] {e}")
@@ -453,12 +610,18 @@ def main() -> None:
     elapsed = (datetime.now() - start_time).total_seconds()
     console.print(f"[dim]Completed in {elapsed:.1f}s[/dim]\n")
     print_summary(results, dry_run=args.dry_run, max_score=config["max_score"], csv_path=csv_path)
+    console.print(f"\n[bold cyan]{cost_report}[/bold cyan]\n")
 
-    if not args.dry_run:
+    if not args.dry_run and not args.csv_only:
         console.print(
             "\n[bold green]✓ Draft grades posted.[/bold green] "
             "Open Google Classroom, review each grade, then click "
             "[bold]Return[/bold] to release to students."
+        )
+    elif args.csv_only:
+        console.print(
+            "\n[bold blue]CSV-only run complete.[/bold blue] "
+            "Remove [bold]--csv-only[/bold] to enable posting."
         )
     else:
         console.print(

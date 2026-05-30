@@ -35,10 +35,25 @@ from __future__ import annotations  # enables list[dict] syntax on Python 3.8/3.
 import csv
 import logging
 import os
+import re
 from datetime import datetime
+from io import BytesIO
 from pathlib import Path
 from typing import Optional
 
+import pypdf
+try:
+    import pytesseract
+    from pdf2image import convert_from_bytes
+    from PIL import Image
+except Exception:  # pragma: no cover - optional OCR deps
+    pytesseract = None
+    convert_from_bytes = None
+    Image = None
+try:
+    import docx
+except Exception:  # pragma: no cover - optional dependency
+    docx = None
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -64,6 +79,7 @@ SCOPES = [
     "https://www.googleapis.com/auth/classroom.coursework.students",
     "https://www.googleapis.com/auth/classroom.rosters.readonly",
     "https://www.googleapis.com/auth/drive.readonly",
+    "https://www.googleapis.com/auth/classroom.courses.readonly",
 ]
 
 
@@ -122,7 +138,24 @@ def authenticate_classroom(credentials_file: str, token_file: str):
         else:
             logger.info("No valid token found — opening browser for authorization...")
             flow = InstalledAppFlow.from_client_secrets_file(credentials_file, SCOPES)
-            creds = flow.run_local_server(port=0)
+
+            # Support headless / non-interactive environments by honoring
+            # the NO_BROWSER environment variable. When set (1/true/yes),
+            # use the console OAuth flow which prints a URL and accepts the
+            # authorization code on stdin instead of spinning up a local web
+            # server.
+            no_browser = os.getenv("NO_BROWSER", "").lower() in ("1", "true", "yes")
+            if no_browser:
+                logger.info("NO_BROWSER set — using console OAuth flow (run_console()).")
+                creds = flow.run_console()
+            else:
+                try:
+                    creds = flow.run_local_server(port=0)
+                except Exception as e:
+                    logger.warning(
+                        "Local server OAuth failed (%s); falling back to console flow.", e
+                    )
+                    creds = flow.run_console()
 
         with open(token_file, "w") as f:
             f.write(creds.to_json())
@@ -237,7 +270,7 @@ def build_drive_service(creds):
     return build("drive", "v3", credentials=creds)
 
 
-def extract_attachment_content(attachment: dict, drive_service) -> Optional[str]:
+def extract_attachment_content(attachment: dict, drive_service) -> tuple[Optional[str], str]:
     """
     Extracts readable text content from a single submission attachment.
 
@@ -268,44 +301,60 @@ def extract_attachment_content(attachment: dict, drive_service) -> Optional[str]
             mime_type = file_meta.get("mimeType", "")
 
             if "google-apps" in mime_type:
-                # Map Google Workspace MIME types to plain-text export formats
                 export_map = {
-                    "application/vnd.google-apps.document":     "text/plain",
-                    "application/vnd.google-apps.spreadsheet":  "text/csv",
+                    "application/vnd.google-apps.document": "text/plain",
+                    "application/vnd.google-apps.spreadsheet": "text/csv",
                     "application/vnd.google-apps.presentation": "text/plain",
-                    "application/vnd.google.colaboratory":      "text/plain",
+                    "application/vnd.google.colaboratory": "text/plain",
                 }
-                export_mime = export_map.get(mime_type, "text/plain")
                 content_bytes = drive_service.files().export(
-                    fileId=file_id, mimeType=export_mime
+                    fileId=file_id, mimeType=export_map.get(mime_type, "text/plain")
                 ).execute()
-                content_str = content_bytes.decode("utf-8", errors="replace")
-                logger.info("  Exported as plain text (%d chars).", len(content_str))
-                return f"=== Attachment: {file_title} ===\n{content_str}"
-
+                return content_bytes.decode("utf-8", errors="replace"), "text/plain"
             else:
-                # Binary or plain-text file uploaded directly (.py, .ipynb, etc.)
                 content_bytes = drive_service.files().get_media(fileId=file_id).execute()
-                content_str = content_bytes.decode("utf-8", errors="replace")
-                logger.info("  Downloaded binary/text file (%d chars).", len(content_str))
-                return f"=== Attachment: {file_title} ===\n{content_str}"
+                if mime_type == "application/pdf":
+                    try:
+                        reader = pypdf.PdfReader(BytesIO(content_bytes))
+                        pages = [page.extract_text() or "" for page in reader.pages]
+                        text = "\n\n".join(pages).strip()
+                        if not text:
+                            ocr_text = _ocr_pdf_bytes(content_bytes)
+                            if ocr_text:
+                                return ocr_text, "application/pdf"
+                            return "[PDF contains no extractable text (scanned/image-based)]", "application/pdf"
+                        return text, "application/pdf"
+                    except Exception as e:
+                        return f"[PDF read error: {e}]", "application/pdf"
+                # Handle .docx files (local uploads or mislabelled types)
+                elif (
+                    mime_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    or (isinstance(file_title, str) and file_title.lower().endswith(".docx"))
+                ):
+                    if docx is None:
+                        return (
+                            f"[Binary .docx attachment (python-docx not installed): {file_title}]",
+                            mime_type,
+                        )
+                    try:
+                        document = docx.Document(BytesIO(content_bytes))
+                        full_text = [para.text for para in document.paragraphs]
+                        text = "\n".join(full_text).strip()
+                        if not text:
+                            return (f"[DOCX contains no extractable text: {file_title}]", mime_type)
+                        return text, mime_type
+                    except Exception as e:
+                        return (f"[DOCX read error: {e}]", mime_type)
+
+                elif _is_text_mime(mime_type):
+                    return content_bytes.decode("utf-8", errors="replace"), mime_type
+                else:
+                    return f"[Binary/non-text attachment: {file_title}]", mime_type
 
         except HttpError as e:
-            if e.resp.status == 403:
-                logger.warning(
-                    "  Permission denied for '%s'. Check that the OAuth account "
-                    "has Viewer access to student Drive files.", file_title
-                )
-            else:
-                logger.warning("  Failed to download '%s': %s", file_title, e)
-            return f"[Could not retrieve attachment: {file_title} — {e}]"
-
+            return f"[Could not retrieve attachment: {file_title} — {e}]", "text/plain"
         except UnicodeDecodeError:
-            logger.warning(
-                "  '%s' appears to be a non-text binary (PDF, image). "
-                "Manual review required.", file_title
-            )
-            return f"[Binary/non-text attachment: {file_title}. Manual review required.]"
+            return f"[Binary/non-text attachment: {file_title}]", "text/plain"
 
     # --- Link attachment ---
     link = attachment.get("link")
@@ -313,7 +362,7 @@ def extract_attachment_content(attachment: dict, drive_service) -> Optional[str]
         url = link.get("url", "")
         title = link.get("title", url)
         logger.info("  Link attachment: '%s' → %s", title, url)
-        return f"[Link Submission: {title} | URL: {url}]"
+        return f"[Link Submission: {title} | URL: {url}]", "text/plain"
 
     # --- YouTube attachment ---
     youtube = attachment.get("youTubeVideo")
@@ -321,10 +370,10 @@ def extract_attachment_content(attachment: dict, drive_service) -> Optional[str]
         url = f"https://www.youtube.com/watch?v={youtube.get('id', '')}"
         title = youtube.get("title", url)
         logger.info("  YouTube attachment: '%s'", title)
-        return f"[YouTube Submission: {title} | URL: {url}]"
+        return f"[YouTube Submission: {title} | URL: {url}]", "text/plain"
 
     logger.warning("  Unrecognized attachment type: %s", list(attachment.keys()))
-    return None
+    return f"[Unrecognized attachment type]", "text/plain"
 
 
 def collect_submission_content(submission: dict, drive_service) -> str:
@@ -347,19 +396,77 @@ def collect_submission_content(submission: dict, drive_service) -> str:
         logger.warning(
             "  Submission ID=%s has no attachments.", submission.get("id")
         )
-        return "[NO ATTACHMENTS FOUND — student may have submitted without uploading work.]"
+        return {"text": "", "binary_parts": []}
 
-    content_parts = []
+    text_parts: list[str] = []
+    binary_parts: list[tuple[bytes, str]] = []
+
     for i, attachment in enumerate(attachments, start=1):
         logger.info("  Processing attachment %d/%d...", i, len(attachments))
-        content = extract_attachment_content(attachment, drive_service)
-        if content:
-            content_parts.append(content)
+        content, mime = extract_attachment_content(attachment, drive_service)
+        if content is None:
+            continue
 
-    if not content_parts:
-        return "[COULD NOT EXTRACT ANY ATTACHMENT CONTENT — all attachments failed to download.]"
+        if isinstance(content, bytes):
+            binary_parts.append((content, mime or "application/octet-stream"))
+        else:
+            # content is text
+            text_parts.append(str(content))
 
-    return "\n\n".join(content_parts)
+    if not text_parts and not binary_parts:
+        return {"text": "", "binary_parts": []}
+
+    return {"text": "\n\n".join(text_parts), "binary_parts": binary_parts}
+
+
+def _is_text_mime(mime: str) -> bool:
+    """Rudimentary check whether a MIME type represents text."""
+    if not mime:
+        return False
+    return mime.startswith("text/") or mime in (
+        "application/json",
+        "application/javascript",
+        "application/xml",
+        "application/x-python-code",
+    )
+
+
+def _ocr_pdf_bytes(content_bytes: bytes) -> str:
+    if pytesseract is None or convert_from_bytes is None or Image is None:
+        logger.warning("OCR skipped: pytesseract/pdf2image/Pillow not installed.")
+        return ""
+
+    poppler_path = os.getenv("POPPLER_PATH", "").strip() or None
+    tesseract_path = os.getenv("TESSERACT_PATH", "").strip()
+    if tesseract_path:
+        tesseract_exe = tesseract_path
+        if os.path.isdir(tesseract_exe):
+            tesseract_exe = os.path.join(tesseract_exe, "tesseract.exe")
+        if os.path.exists(tesseract_exe):
+            pytesseract.pytesseract.tesseract_cmd = tesseract_exe
+        else:
+            logger.warning("TESSERACT_PATH set but tesseract.exe not found: %s", tesseract_exe)
+    if poppler_path:
+        pdftoppm_path = os.path.join(poppler_path, "pdftoppm.exe")
+        if not os.path.exists(pdftoppm_path):
+            logger.warning("POPPLER_PATH set but pdftoppm.exe not found: %s", pdftoppm_path)
+    else:
+        logger.warning("POPPLER_PATH is not set; OCR may fail for scanned PDFs.")
+
+    try:
+        images = convert_from_bytes(content_bytes, poppler_path=poppler_path)
+    except Exception as e:
+        logger.warning("OCR skipped: PDF to image conversion failed (%s).", e)
+        return ""
+
+    ocr_pages: list[str] = []
+    for img in images:
+        try:
+            ocr_pages.append(pytesseract.image_to_string(img))
+        except Exception as e:
+            logger.warning("OCR page failed: %s", e)
+
+    return "\n\n".join([t.strip() for t in ocr_pages if t.strip()])
 
 
 # ---------------------------------------------------------------------------
@@ -430,7 +537,19 @@ def post_draft_grade(
 # Feedback CSV Export
 # ---------------------------------------------------------------------------
 
-def save_feedback_to_csv(results: list[dict], output_dir: str = ".") -> str:
+def _safe_filename(label: str) -> str:
+    # Strip only Windows-invalid filename characters; keep title punctuation like # and en dash.
+    cleaned = re.sub(r"[<>:\"/|?*]", "", label)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    return cleaned
+
+
+
+def save_feedback_to_csv(
+    results: list[dict],
+    output_dir: str = ".",
+    coursework_title: str = "",
+) -> str:
     """
     Saves all grading results and AI feedback to a timestamped CSV file.
 
@@ -442,14 +561,19 @@ def save_feedback_to_csv(results: list[dict], output_dir: str = ".") -> str:
       - Mail-merge feedback directly to students via email
       - Keep a local grading record for auditing
 
-    CSV columns:
-        name, email, submission_id, score, max_score, percentage, status, feedback
+    CSV columns (core):
+        Student Name, Score, Rubric Score, Max Score, Percentage, Result,
+        AI Detection, CDRP Flags, Transparency Report, Feedback, Status
+
+    Per-criterion columns are appended dynamically based on the criteria list
+    returned by the grader — one column per criterion in the format
+    "[Criterion Name] Score", "[Criterion Name] Level", "[Criterion Name] Evidence".
+    This means the column count adapts automatically to any rubric.
 
     Args:
         results:    List of result dicts accumulated during the pipeline run.
-                    Each dict should have: name, email, submission_id, score,
-                    feedback, status keys.
         output_dir: Directory where the CSV will be written. Defaults to CWD.
+        coursework_title: Used for the output filename when provided.
 
     Returns:
         The full path to the written CSV file.
@@ -458,14 +582,72 @@ def save_feedback_to_csv(results: list[dict], output_dir: str = ".") -> str:
         RuntimeError: If the CSV cannot be written (disk full, bad path, etc.).
     """
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"grading_results_{timestamp}.csv"
+    if coursework_title:
+        slug = _safe_filename(coursework_title)
+        filename = f"{slug}-results.csv" if slug else f"grading_results_{timestamp}.csv"
+    else:
+        filename = f"grading_results_{timestamp}.csv"
     filepath = os.path.join(output_dir, filename)
 
-    fieldnames = [
-        "name", "email", "submission_id",
-        "score", "max_score", "percentage",
-        "status", "feedback"
+    # ── AI label derived from CDRP flags + Transparency Report ───────────────
+    # Based on CEIT Faculty Operational Protocol (Dan's AI Detection Guide).
+    # Numeric percentages are rejected by the guide (Section 3) as unreliable.
+    def _ai_label(flag_count: Optional[int], tr_status: str) -> str:
+        """
+        Rules (matching the guide's Section 5 Human-in-the-Loop flow):
+          - Valid Transparency Report always clears to Human Written regardless
+            of flag count — student disclosed and explained their use.
+          - 0 flags → Human Written  (no structural AI markers found)
+          - 1 flag  → Mostly Human   (one weak signal; borderline)
+          - 2–3 flags → Mostly AI    (pattern is consistent across submission)
+          - 4+  flags → AI Generated (pervasive CDRP throughout)
+        """
+        if tr_status == "Present and reflective":
+            return "Human Written"
+        if flag_count is None:
+            return ""
+        if flag_count == 0:
+            return "Human Written"
+        if flag_count == 1:
+            return "Mostly Human"
+        if flag_count <= 3:
+            return "Mostly AI"
+        return "AI Generated"
+
+    # ── Discover all criterion names across all results ───────────────────────
+    # Criteria names are collected in insertion order so the column layout is
+    # consistent even if different submissions have slightly different ordering.
+    seen_criteria: list[str] = []
+    for r in results:
+        for c in r.get("criteria", []):
+            name = c.get("name", "")
+            if name and name not in seen_criteria:
+                seen_criteria.append(name)
+
+    # ── Build fieldnames ──────────────────────────────────────────────────────
+    core_fields = [
+        "Student Name",
+        "Score",           # reflected_score (after any AI penalty)
+        "Rubric Score",    # rubric_score (before penalty) — for instructor review
+        "Max Score",
+        "Percentage",
+        "Result",          # PASS / FAIL based on 75% threshold
+        "AI Detection",
+        "CDRP Flags",
+        "Transparency Report",
+        "Math Verified",
+        "Feedback",
+        "Status",
     ]
+    # Append one triplet of columns per criterion in rubric order
+    criterion_fields = []
+    for name in seen_criteria:
+        criterion_fields += [
+            f"{name} — Score",
+            f"{name} — Level",
+            f"{name} — Evidence",
+        ]
+    fieldnames = core_fields + criterion_fields
 
     try:
         with open(filepath, "w", newline="", encoding="utf-8") as f:
@@ -473,23 +655,59 @@ def save_feedback_to_csv(results: list[dict], output_dir: str = ".") -> str:
             writer.writeheader()
 
             for r in results:
-                score = r.get("score", "")
-                max_s = r.get("max_score", "")
+                score        = r.get("score", "")          # reflected_score
+                rubric_score = r.get("rubric_score", score) # before penalty
+                max_s        = r.get("max_score", "")
+
+                flag_count = r.get("cdrp_flag_count")
+                flag_count_int = None
+                if isinstance(flag_count, (int, float)):
+                    flag_count_int = int(flag_count)
+                elif isinstance(flag_count, str) and flag_count.strip().isdigit():
+                    flag_count_int = int(flag_count.strip())
+
+                tr_status = r.get("transparency_report", "")
+
                 pct = (
                     f"{(score / max_s * 100):.1f}%"
                     if isinstance(score, int) and max_s
                     else ""
                 )
-                writer.writerow({
-                    "name":          r.get("name", ""),
-                    "email":         r.get("email", ""),
-                    "submission_id": r.get("submission_id", ""),
-                    "score":         score,
-                    "max_score":     max_s,
-                    "percentage":    pct,
-                    "status":        r.get("status", ""),
-                    "feedback":      r.get("feedback", ""),
-                })
+
+                # PASS/FAIL at 75% threshold (Philippine HE standard)
+                if isinstance(score, int) and max_s:
+                    result_label = "PASS" if (score / max_s) >= 0.75 else "FAIL"
+                else:
+                    result_label = ""
+
+                row = {
+                    "Student Name":      r.get("name", ""),
+                    "Score":             score,
+                    "Rubric Score":      rubric_score,
+                    "Max Score":         max_s,
+                    "Percentage":        pct,
+                    "Result":            result_label,
+                    "AI Detection":      _ai_label(flag_count_int, tr_status),
+                    "CDRP Flags":        flag_count_int if flag_count_int is not None else "",
+                    "Transparency Report": tr_status,
+                    "Math Verified":     r.get("math_verified", ""),
+                    "Feedback":          r.get("feedback", ""),
+                    "Status":            r.get("status", ""),
+                }
+
+                # Index this submission's criteria by name for fast lookup
+                criteria_by_name = {
+                    c.get("name", ""): c
+                    for c in r.get("criteria", [])
+                }
+                for name in seen_criteria:
+                    c = criteria_by_name.get(name, {})
+                    row[f"{name} — Score"]    = c.get("score", "") if c else ""
+                    row[f"{name} — Level"]    = c.get("level", "") if c else ""
+                    row[f"{name} — Evidence"] = c.get("evidence", "") if c else ""
+
+                writer.writerow(row)
+
     except OSError as e:
         raise RuntimeError(
             f"Failed to write feedback CSV to '{filepath}': {e}\n"

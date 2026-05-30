@@ -15,3 +15,8 @@ python-dotenv==1.0.1
 # Utilities
 tenacity==8.3.0        # Retry logic with exponential backoff for API rate limits
 rich==13.7.1           # Pretty console output for progress/logging
+pypdf==6.10.2
+python-docx==1.1.2
+pytesseract==0.3.13
+pdf2image==1.17.0
+Pillow==11.3.0
