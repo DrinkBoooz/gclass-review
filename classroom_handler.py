@@ -221,7 +221,7 @@ def get_turned_in_submissions(service, course_id: str, coursework_id: str) -> li
             .list(
                 courseId=course_id,
                 courseWorkId=coursework_id,
-                states=["TURNED_IN"],
+                # states=["TURNED_IN"], 
                 pageToken=page_token,
                 fields="*"
             )
@@ -715,6 +715,7 @@ def save_feedback_to_csv(
     fieldnames = [
         "Student Name",
         "Score",
+        "RubricScore",
         "Max Score",
         "Percentage",
         "Feedback",
@@ -745,15 +746,16 @@ def save_feedback_to_csv(
                 try:
                     pct = (
                         f"{(float(score) / float(max_s) * 100):.2f}%"
-                        if score != "" and max_s
+                        if score != "" and str(score).strip() != "-" and max_s
                         else ""
                     )
-                except (TypeError, ZeroDivisionError):
+                except (TypeError, ZeroDivisionError, ValueError):
                     pct = ""
 
                 writer.writerow({
                     "Student Name": r.get("name", ""),
                     "Score":        score,
+                    "RubricScore":  r.get("rubric_score", ""),
                     "Max Score":    max_s,
                     "Percentage":   pct,
                     "Feedback":     r.get("feedback", ""),

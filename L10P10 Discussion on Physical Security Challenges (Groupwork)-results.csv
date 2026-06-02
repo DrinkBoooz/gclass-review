@@ -1,190 +1,24 @@
-Student Name,Score,Max Score,Percentage,Feedback,Status,AI Detection,CDRP Flags
-ALELHY ALLESSANDRA DE RUEDA,95.0,100,95.00%,"<AI_DETECTION_EVIDENCE_LOG>
+Student Name,Score,RubricScore,Max Score,Percentage,Feedback,Status,AI Detection,CDRP Flags
+Gillo Supnet,-,-,100,,No attachments submitted.,skipped_no_content,,
+KEVIN LESTER HO,-,-,100,,No attachments submitted.,skipped_no_content,,
+ALELHY ALLESSANDRA DE RUEDA,0,95,100,0.00%,"<AI_DETECTION_EVIDENCE_LOG>
 PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
 CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
                            CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
-1. SENTENCE: ""Through group discussion, we were able to connect these areas and understand that cybersecurity is not only about firewalls and antivirus.""
-   CONTEXT: ""overall understanding. >> Through group discussion, we were able to connect these areas and understand that cybersecurity is not only about firewalls and antivirus. << Physical controls, employee""
-</AI_DETECTION_EVIDENCE_LOG>
-
-===GRADE BREAKDOWN===
-- Rubric Score: 95 / 100
-- Reflected Score: 95 / 100
-- Passing Threshold: 75% = 75 / 100
-- Result: PASS
-- AI Label: Mostly Human
-- CDRP Flags: 1
-- Transparency Report: Not present
-CRITERIA:
-- Following Instructions & Formatting: 20/25 — Good — Portfolio #10: Discussion... Instructions — Full prompt text and headers included in submission despite instruction to remove them.
-- Physical & Environmental Security Analysis: 25/25 — Excellent — Part 1: Fire & HVAC Physics — Aegis should replace the water sprinklers with a clean agent... FM-200 or Inergen.
-- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Part 2: The BYOD Dilemma — MDM system can delete only the corporate container that contains patient records.
-- AI Originality & Group Effort: 25/25 — Excellent — Reflection: Question 2 — Each member was able to focus on a different part of the problem... one member was assigned to analyze facility access controls.
-- TOTAL: 95/100 — Math verified: 20+25+25+25 = 95
-===STUDENT FEEDBACK===
-You and your team provided a highly comprehensive analysis of the Aegis Healthcare scenario, correctly identifying and applying technical solutions to each specific incident. Your explanation of the BYOD remote wipe dilemma in the Mobile Security section was particularly strong, as it clearly articulated how containerization protects both corporate data and employee privacy. The inclusion of all five group members and the detailed 4-step hardening process for workstations demonstrates a high level of collaborative effort and technical accuracy.
-
-To improve future submissions, please ensure you follow the formatting instructions more strictly by removing the prompt text, objectives, and instructions from your final document. While your technical content is excellent, a professional report should only contain your group's original analysis and findings rather than echoing the activity's background text. Additionally, ensure that your file naming convention follows the requested leader surname format to assist in administrative tracking.
-
-Your grasp of physical security concepts and their relationship to the CIA Triad is impressive. Continue to focus on how physical layers support digital defenses in your upcoming portfolios.
-
-Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
-""Through group discussion, we were able to connect these areas and understand that cybersecurity is not only about firewalls and antivirus.""
-(Category E — The ""not only about X, but also about Y"" construction creates a broad ethical verdict that summarizes the subject matter without citing any specific insights or unique perspectives generated during the group's actual discussion.) Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly Human,1
-CLARENCE MICHAEL BENITEZ,,100,,,skipped_no_content,,
-ALEXANDER JOVE MIKAEL SIMPELO,,100,,,skipped_no_content,,
-EUGENE RIZEL VICEDO,,100,,,skipped_no_content,,
-TANYA DENISE YAMBAO,,100,,,skipped_no_content,,
-JOSHUA MARL SARA,,100,,,skipped_no_content,,
-CHRISTINE ANNE ALCANTARA,86.0,100,86.00%,"<AI_DETECTION_EVIDENCE_LOG>
-PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
-CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
-                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
-1. SENTENCE: ""Physical security is considered the “Outer Shell” of the CIA Triad because all digital security systems depend on physical protection to function properly.""
-   CONTEXT: ""unified response) >> Physical security is considered the “Outer Shell” of the CIA Triad because all digital security systems depend on physical protection to function properly. << Even the most""
-2. SENTENCE: ""This resulted in a more well-rounded and accurate analysis compared to working alone, where some issues or solutions might have been overlooked.""
-   CONTEXT: ""the Aegis scenario. >> This resulted in a more well-rounded and accurate analysis compared to working alone, where some issues or solutions might have been overlooked. << [end]""
-</AI_DETECTION_EVIDENCE_LOG>
-
-===GRADE BREAKDOWN===
-- Rubric Score: 86 / 100
-- Reflected Score: 86 / 100
-- Passing Threshold: 75% = 75 / 100
-- Result: PASS
-- AI Label: Mostly Human
-- CDRP Flags: 2
-- Transparency Report: Not present
-CRITERIA:
-- Following Instructions & Formatting: 16/25 — Good — Alcantara_Portfolio10.pdf (assumed) includes all 5 group names but failed to remove activity headers and instruction text.
-- Physical & Environmental Security Analysis: 25/25 — Excellent — Part 1: correctly defines FAR/FRR/EER balance, recommends FM-200, explains positive pressure dust mitigation, and double-conversion UPS.
-- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Part 2: provides clear MDM containerization logic for remote wipes and argues for EDR behavioral monitoring over EPP signatures.
-- AI Originality & Group Effort: 20/25 — Good — Reflection section is present and addresses group dynamics, though it contains contextually detached rhetorical polish.
-- TOTAL: 86/100 — Math verified: 16+25+25+20 = 86
-===STUDENT FEEDBACK===
-You demonstrated a high level of technical proficiency in your analysis of the Aegis Healthcare scenario, particularly in your explanation of biometric accuracy and the physics of positive air pressure. Your recommendation for a double-conversion online UPS shows a strong understanding of how to mitigate the specific power anomalies described in the case study. The 4-step hardening process in Part 3 is logical and correctly prioritizes the principle of least privilege.
-
-To improve your future submissions, please ensure you follow the formatting instructions more strictly by removing all instruction text and activity headers before finalization. While your technical sections were well-anchored to the scenario, your group reflection could be strengthened by including more specific examples of how your team resolved disagreements or combined different technical perspectives. Providing a Transparency Report would also clarify your use of digital writing assistants in the final polishing of your text.
-
-Your technical work is excellent and shows you have a firm grasp of the physical and endpoint security layers required for critical data environments.
-
-Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
-
-""Physical security is considered the “Outer Shell” of the CIA Triad because all digital security systems depend on physical protection to function properly.""
-(Category E — the ""is considered the [metaphor] of [concept] because..."" structure creates a conceptual claim that is entirely portable to any security analysis regardless of the facility or organization involved)
-
-""This resulted in a more well-rounded and accurate analysis compared to working alone, where some issues or solutions might have been overlooked.""
-(Category E — the ""resulted in a more [adjective] and [adjective] analysis"" marker provides a broad verdict on team performance that functions as a universal conclusion for any collaborative activity)
-
-Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly Human,2
-MARC MANUEL MARQUEZ,,100,,,skipped_no_content,,
-STEVE MARION CHAN,,100,,,skipped_no_content,,
-MARY DENISE HARDER,,100,,,skipped_no_content,,
-GENEVIEVE GAMAY,100.0,100,100.00%,"<AI_DETECTION_EVIDENCE_LOG>
-PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
-CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
-                           CONTEXT: ""[3 words before flagged phrase] >> [flagged phrase] << [3 words after]""):
-1. SENTENCE: ""Biometric authentication relies on statistical thresholds rather than perfect binary matching.""
-   CONTEXT: ""perfect binary matching. >> Biometric authentication relies on statistical thresholds rather than perfect binary matching. << False Accept Rate""
-2. SENTENCE: ""Traditional water sprinklers (Class A fire suppression systems) extinguish fires by removing heat.""
-   CONTEXT: ""to Clean Agents >> Traditional water sprinklers (Class A fire suppression systems) extinguish fires by removing heat. << While effective for""
-3. SENTENCE: ""Relying on legacy antivirus is like hiring a security guard who only stops people whose faces are already on a 'Wanted' poster.""
-   CONTEXT: ""of the past. >> Relying on legacy antivirus is like hiring a security guard who only stops people whose faces are already on a 'Wanted' poster. << That is exactly""
-4. SENTENCE: ""Think of it as building a digital vault inside the phone.""
-   CONTEXT: ""with containerization. >> Think of it as building a digital vault inside the phone. << All corporate data""
-5. SENTENCE: ""Software firewalls only monitor network packets; they cannot block physical hardware devices or stop electromagnetic leaks.""
-   CONTEXT: ""in real time. >> Software firewalls only monitor network packets; they cannot block physical hardware devices or stop electromagnetic leaks. << Because software defenses""
-</AI_DETECTION_EVIDENCE_LOG>
-
-===GRADE BREAKDOWN===
-- Rubric Score: 100 / 100
-- Reflected Score: 100 / 100
-- Passing Threshold: 75% = 75 / 100
-- Result: PASS
-- AI Label: Mostly AI
-- CDRP Flags: 5
-- Transparency Report: Present and reflective
-CRITERIA:
-- Following Instructions & Formatting: 25/25 — Excellent — names listed: Dizor, Gamay, Harder, Japag, Lambojon
-- Physical & Environmental Security Analysis: 25/25 — Excellent — Part 1: Biometrics (EER <= 0.001%), HVAC (Positive Pressure), UPS (Double-Conversion)
-- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Part 2: MDM (Containerization), EDR (Behavioral monitoring), Hardening (4-step process)
-- AI Originality & Group Effort: 25/25 — Excellent — AI Use Transparency Report: present and reflective — lists Claude and Gemini prompts
-- TOTAL: 100/100 — Math verified: 25+25+25+25 = 100
-
-===STUDENT FEEDBACK===
-You have provided an exceptionally thorough analysis of the Aegis Healthcare scenario, particularly in the way you linked the physical vulnerabilities to specific technical solutions. Your explanation of the Equal Error Rate (EER) in the biometrics section and the inclusion of specific ports like 443 and 3389 in the hardening section demonstrate a high level of technical precision. The group reflection clearly illustrates how your team collaborated to identify diverse risks, such as the relationship between HVAC pressure and particulate contamination.
-
-The submission meets all rubric requirements for the Excellent band. To further improve future reports, you might consider providing specific manufacturer examples for the Clean Agent systems or the MDM platforms mentioned to enhance the consulting aspect of the proposal. Additionally, ensuring that all background scenario text is removed to focus solely on your original analysis would make the report even more professional.
-
-Your team has demonstrated a strong grasp of both physical and endpoint security principles. Keep maintaining this level of detail and collaborative synthesis in your future portfolios. Thank you for including your Transparency Report and for being upfront about your use of AI tools in this submission.",success,Human Written,0
-MIKYLA REIGN VIDAMO,,100,,,skipped_no_content,,
-CARL LOWELL DELA PENA,,100,,,skipped_no_content,,
-PRIAM REYES,,100,,,skipped_no_content,,
-PAULA PAREDES,60.0,100,60.00%,"<AI_DETECTION_EVIDENCE_LOG>
-PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
-CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
-                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
-1. SENTENCE: ""Traditional software firewalls cannot stop these attacks because they only monitor digital network traffic.""
-   CONTEXT: ""hardware protections. Traditional >> Traditional software firewalls cannot stop these attacks because they only monitor digital network traffic. << Hardware keyloggers operate""
-2. SENTENCE: ""No matter how advanced a company’s cybersecurity tools are, they become useless if attackers can directly access the hardware or disrupt the infrastructure supporting it.""
-   CONTEXT: ""access or damage. No matter >> No matter how advanced a company’s cybersecurity tools are, they become useless if attackers can directly access the hardware or disrupt the infrastructure supporting it. << These physical failures""
-3. SENTENCE: ""This shows that cybersecurity does not only depend on software and encryption, but also on protecting the physical environment where systems operate.""
-   CONTEXT: ""security operations. This >> This shows that cybersecurity does not only depend on software and encryption, but also on protecting the physical environment where systems operate. << Even the strongest""
-4. SENTENCE: ""Working in a 5 person team helped us evaluate physical security challenges more effectively because each member contributed different ideas, observations, and perspectives.""
-   CONTEXT: ""working alone? Working >> Working in a 5 person team helped us evaluate physical security challenges more effectively because each member contributed different ideas, observations, and perspectives. << Some members focused""
-</AI_DETECTION_EVIDENCE_LOG>
-
-===GRADE BREAKDOWN===
-- Rubric Score: 100 / 100
-- Reflected Score: 60 / 100
-- Passing Threshold: 75% = 75 / 100
-- Result: FAIL
-- AI Label: Mostly AI
-- CDRP Flags: 4
-- Transparency Report: Not present
-CRITERIA:
-- Following Instructions & Formatting: 25/25 — Excellent — Paredes, Perido, Reyes, Sara, Simpelo, Sumabat listed.
-- Physical & Environmental Security Analysis: 25/25 — Excellent — Part 1: ""A lower EER means the biometric system is more accurate"".
-- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Part 2: ""Containerization separates company data from personal files"".
-- AI Originality & Group Effort: 25/25 — Excellent — Reflection: ""Working in a 5 person team helped us evaluate"".
-- TOTAL: 100/100 — Math verified: 25+25+25+25 = 100
-
-===STUDENT FEEDBACK===
-Your group provided an exceptionally detailed analysis of the Aegis Healthcare scenario, particularly in the technical differentiation between power anomalies and the mechanics of positive pressure HVAC systems. The explanation of biometric accuracy metrics in Part 1 was flawlessly tied to the operational needs of a healthcare facility, showing a strong grasp of how FAR and FRR impact both security and workflow. Furthermore, your argument for EDR over legacy EPP correctly identified the critical role of behavioral monitoring in stopping fileless malware, which is a high-level insight for this portfolio.
-
-The hardening protocol outlined in Part 3 is logical and follows industry best practices for endpoint security, especially the emphasis on local logging for incident investigation. The transition from physical threats like hardware keyloggers to the limitations of digital firewalls was well-articulated and demonstrated a clear understanding of the layers of the CIA triad. While the content itself is technically perfect, the presence of several contextually detached language patterns has impacted the final reflected score.
-
-Continue to apply this level of technical depth in future portfolios, but ensure that all reflections and analyses are expressed in your own unique group voice to avoid structural markers associated with automated generation.
-
-Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
-""Traditional software firewalls cannot stop these attacks because they only monitor digital network traffic.""
-(Category C — the sentence defines the function of a software firewall in a generic formal register without referencing the specific hardware-based interception threats mentioned in the Aegis scenario)
-""No matter how advanced a company’s cybersecurity tools are, they become useless if attackers can directly access the hardware or disrupt the infrastructure supporting it.""
-(Category A — the ""No matter... they become"" construction creates a universal moral maxim about physical security that remains valid even if the Aegis Healthcare context is entirely removed)
-""This shows that cybersecurity does not only depend on software and encryption, but also on protecting the physical environment where systems operate.""
-(Category E — the ""not only... but also"" structure delivers a broad ethical verdict that functions as a portable conclusion applicable to any security essay)
-""Working in a 5 person team helped us evaluate physical security challenges more effectively because each member contributed different ideas, observations, and perspectives.""
-(Category E — removing the phrase ""physical security challenges"" leaves a generic template for group collaboration that does not describe any specific interaction or debate unique to your team)
-Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly AI,4
-KURT CADORNA,,100,,,skipped_no_content,,
-IAN LEMUEL VERGARA,,100,,,skipped_no_content,,
-LLOYD PERIDO,,100,,,skipped_no_content,,
-JASMYN JAPAG,,100,,,skipped_no_content,,
-NEIL ANGELO CRISOSTOMO,0.0,100,0.00%,"<AI_DETECTION_EVIDENCE_LOG>
-PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
-CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
-                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
-1. SENTENCE: ""A mantrap has two doors where only one door can open at a time.""
-   CONTEXT: ""server room. >> A mantrap has two doors where only one door can open at a time. << Because of this""
-2. SENTENCE: ""Traditional antivirus usually relies on signatures. It detects malware by comparing files with known malware patterns.""
-   CONTEXT: ""to Response. >> Traditional antivirus usually relies on signatures. It detects malware by comparing files with known malware patterns. << The problem of""
-3. SENTENCE: ""Physical security is considered the outer shell of the CIA Triad because it protects the actual systems, devices, and facilities where data is stored and processed.""
-   CONTEXT: ""Reflection 1. >> Physical security is considered the outer shell of the CIA Triad because it protects the actual systems, devices, and facilities where data is stored and processed. << Even if Aegis""
-4. SENTENCE: ""Unnecessary services can become entry points for attackers.""
-   CONTEXT: ""turned off. >> Unnecessary services can become entry points for attackers. << For example, remote""
-5. SENTENCE: ""Open ports increase the attack surface of a workstation.""
-   CONTEXT: ""Hardening Process >> Open ports increase the attack surface of a workstation. << Aegis should scan""
-6. SENTENCE: ""Users should only have the access rights needed for their job.""
-   CONTEXT: ""management >> Users should only have the access rights needed for their job. << Normal employees should""
+1. SENTENCE: ""This strengthens identity verification because access is based on a person’s physical characteristics, not only on a badge that can be stolen or borrowed.""
+   CONTEXT: ""identity verification because >> This strengthens identity verification because access is based on a person’s physical characteristics, not only on a badge that can be stolen or borrowed. << Biometric accuracy can""
+2. SENTENCE: ""The lower the EER, the more accurate and reliable the biometric system is.""
+   CONTEXT: ""Equal Error Rate. >> The lower the EER, the more accurate and reliable the biometric system is. << For Aegis, a""
+3. SENTENCE: ""Clean agents can suppress fire without leaving residue and without damaging electronic equipment.""
+   CONTEXT: ""FM-200 or Inergen. >> Clean agents can suppress fire without leaving residue and without damaging electronic equipment. << This makes them""
+4. SENTENCE: ""This type of UPS continuously converts incoming AC power to DC and then converts it back to clean AC power.""
+   CONTEXT: ""online UPS. This >> This type of UPS continuously converts incoming AC power to DC and then converts it back to clean AC power. << Because of this,""
+5. SENTENCE: ""Containerization separates corporate data from personal data by placing work-related files, apps, and records inside a protected corporate container or sandbox.""
+   CONTEXT: ""with containerization. Containerization >> Containerization separates corporate data from personal data by placing work-related files, apps, and records inside a protected corporate container or sandbox. << This solves the""
+6. SENTENCE: ""It detects malware by comparing files with known malware patterns.""
+   CONTEXT: ""on signatures. It >> It detects malware by comparing files with known malware patterns. << The problem of""
+7. SENTENCE: ""Physical security is considered the outer shell of the CIA Triad because it protects the actual systems, devices, and facilities where data is stored and processed.""
+   CONTEXT: ""CIA Triad? Physical >> Physical security is considered the outer shell of the CIA Triad because it protects the actual systems, devices, and facilities where data is stored and processed. << Even if Aegis""
 </AI_DETECTION_EVIDENCE_LOG>
 
 ===GRADE BREAKDOWN===
@@ -194,184 +28,389 @@ CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submissio
 - Passing Threshold: 75% = 75 / 100
 - Result: FAIL
 - AI Label: AI Generated
-- CDRP Flags: 5
+- CDRP Flags: 7
 - Transparency Report: Not present
 CRITERIA:
-- Following Instructions & Formatting: 25/25 — Excellent — Alex De Rueda, Carl Lowell B. Dela Pena, Niel Crisostomo, Ron Jhon Kort Diego, Steve Marion Chan listed at top.
-- Physical & Environmental Security Analysis: 25/25 — Excellent — Aegis Healthcare Processing should install a mantrap... FAR, FRR, and EER.
-- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — MDM solution with containerization... selective remote wipe.
-- AI Originality & Group Effort: 20/25 — Good — Physical security is considered the outer shell... generic phrasing.
-- TOTAL: 95/100 — Math verified: 25+25+25+20 = 95
-
+- Following Instructions & Formatting: 20/25 — Good — Portfolio #10: Discussion: Header and instruction text were not removed as required by the group requirement instructions.
+- Physical & Environmental Security Analysis: 25/25 — Excellent — Part 1: Facility Controls: Correct explanation of FAR/FRR/EER and recommendation of double-conversion online UPS.
+- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Part 2: Endpoint Protection: Detailed explanation of MDM containerization and EDR behavioral monitoring for fileless malware.
+- AI Originality & Group Effort: 25/25 — Excellent — Reflection: Group provided a unified response addressing the CIA Triad and team collaboration benefits.
+- TOTAL: 95/100 — Math verified: 20+25+25+25 = 95
 ===STUDENT FEEDBACK===
-Your group provided a highly detailed and technically accurate analysis of the physical security challenges at Aegis Healthcare. You correctly identified the specific UPS architecture needed to handle dirty power and provided a clear explanation of how positive pressure solves the dust accumulation issue. The proposal for MDM containerization was particularly strong, as it directly addressed the legal and privacy dilemma regarding the doctor's personal files.
+You demonstrated a high level of technical understanding in your analysis of the Aegis Healthcare scenario, particularly in your detailed explanation of how a double-conversion online UPS protects against ""dirty power"" in Part 1. Your strategy for addressing the BYOD dilemma using containerization and selective remote wipes was precisely aligned with the legal and privacy needs of the case study. The 4-step hardening process you outlined in Part 3 provides a logical and comprehensive baseline for securing the facility's workstations.
 
-The hardening process for workstations is logical, though you could have provided more specific examples of which ports are commonly closed in a healthcare environment beyond just ""unused ports."" While your reflection correctly identifies the ""Outer Shell"" concept, it would have been improved by including more specific examples of how your group members' different perspectives changed your final recommendations.
+To further improve your future submissions, ensure you strictly follow the formatting instructions regarding the removal of prompt headers and rubric text to maintain a professional report appearance. While your technical definitions are accurate, you could enhance the depth of your analysis by specifically naming the types of ""legitimate system tools"" beyond PowerShell that EDR might monitor in a healthcare environment. Additionally, ensure that your group's unique voice is clearly distinguishable from standard textbook definitions to better showcase your original synthesis of the material.
 
-This submission demonstrates a strong grasp of the technical requirements and scenario application. To further improve, ensure that technical definitions are phrased in your own unique voice rather than relying on standard textbook descriptions.
+Your [reflection / analysis / written response] contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
 
-Your analysis contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+""[...] access is based on a person’s physical characteristics, not only on a badge that can be stolen or borrowed.""
+(Category B — The ""not only on X but Y"" structure provides a generic contrast that applies to any biometric implementation without citing specific Aegis hardware.)
 
-""A mantrap has two doors where only one door can open at a time.""
-(Category D — This sentence defines the mechanism of a mantrap using a generic functional description that contains no specific facility or Aegis-related details.)
+""The lower the EER, the more accurate and reliable the biometric system is.""
+(Category C — This sentence uses a comparative structural marker to state a mathematical fact that remains valid for any biometric system regardless of the facility context.)
 
-""Traditional antivirus usually relies on signatures. It detects malware by comparing files with known malware patterns.""
-(Category D — The description of signature-based detection is a portable technical definition that does not reference the specific workstations or healthcare context of the Aegis scenario.)
+""Clean agents can suppress fire without leaving residue and without damaging electronic equipment.""
+(Category C — The phrase provides a functional definition of clean agents that is entirely portable to any data center or library fire safety analysis.)
+
+""This type of UPS continuously converts incoming AC power to DC and then converts it back to clean AC power.""
+(Category C — The technical description of the conversion process is a standard definition that does not depend on the specific Aegis brownout scenario to be accurate.)
+
+""Containerization separates corporate data from personal data by placing work-related files, apps, and records inside a protected corporate container or sandbox.""
+(Category C — The sentence defines a technical concept using generic categories like 'corporate data' and 'personal data' which are valid for any BYOD policy.)
+
+""It detects malware by comparing files with known malware patterns.""
+(Category C — This is a fundamental definition of signature-based detection that lacks any specific reference to the Aegis workstations or the fileless malware mentioned in the scenario.)
 
 ""Physical security is considered the outer shell of the CIA Triad because it protects the actual systems, devices, and facilities where data is stored and processed.""
-(Category E — This sentence presents the ""outer shell"" concept as a universal theoretical truth that would remain valid in any essay regarding the CIA Triad.)
+(Category E — This introductory definition of physical security’s role in the CIA Triad is a universal academic statement that could conclude any security reflection.)
 
-""Unnecessary services can become entry points for attackers.""
-(Category E — The statement regarding attack surfaces is a standalone security maxim that is not anchored to the specific services or environment of the Aegis facility.)
-
-""Open ports increase the attack surface of a workstation.""
-(Category E — This phrase functions as a general hardening principle that could be transplanted to any IT security submission without modification.)
-
-Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,AI Generated,5
-CHARLIZE ELLAINE DIZOR,,100,,,skipped_no_content,,
-TRISHA CARIAS,100.0,100,100.00%,"<AI_DETECTION_EVIDENCE_LOG>
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,AI Generated,7
+CLARENCE MICHAEL BENITEZ,-,-,100,,No attachments submitted.,skipped_no_content,,
+ALEXANDER JOVE MIKAEL SIMPELO,-,-,100,,No attachments submitted.,skipped_no_content,,
+EUGENE RIZEL VICEDO,-,-,100,,No attachments submitted.,skipped_no_content,,
+TANYA DENISE YAMBAO,-,-,100,,No attachments submitted.,skipped_no_content,,
+REAVEN MIANO,-,-,100,,No attachments submitted.,skipped_no_content,,
+JOSHUA MARL SARA,-,-,100,,No attachments submitted.,skipped_no_content,,
+CHRISTINE ANNE ALCANTARA,60,93,100,60.00%,"<AI_DETECTION_EVIDENCE_LOG>
 PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
 CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
                            CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
-1. SENTENCE: ""This occurs regardless of whether that specific attack has been seen before.""
-   CONTEXT: ""responds to it. >> This occurs regardless of whether that specific attack has been seen before. << For Aegis Healthcare""
-2. SENTENCE: ""A compromised physical environment means the most expensive digital defenses you have are already sitting on a cracked foundation.""
-   CONTEXT: ""trivially bypassable. >> A compromised physical environment means the most expensive digital defenses you have are already sitting on a cracked foundation. << [end of submission]""
+1. SENTENCE: ""Working in a 5-person team allowed us to analyze the problem from multiple perspectives instead of relying on a single viewpoint.""
+   CONTEXT: ""single viewpoint. >> Working in a 5-person team allowed us to analyze the problem from multiple perspectives instead of relying on a single viewpoint. << Each member contributed""
+2. SENTENCE: ""This resulted in a more well-rounded and accurate analysis compared to working alone, where some issues or solutions might have been overlooked.""
+   CONTEXT: ""Aegis scenario. >> This resulted in a more well-rounded and accurate analysis compared to working alone, where some issues or solutions might have been overlooked. << [End of document]""
+3. SENTENCE: ""This approach separates corporate data into a secure, encrypted container within the phone, completely isolated from personal apps and files.""
+   CONTEXT: ""sandboxing). >> This approach separates corporate data into a secure, encrypted container within the phone, completely isolated from personal apps and files. << This eliminates the""
+4. SENTENCE: ""This eliminates the risk of data leakage while also respecting the employee’s personal privacy.""
+   CONTEXT: ""and files. >> This eliminates the risk of data leakage while also respecting the employee’s personal privacy. << [End of section]""
 </AI_DETECTION_EVIDENCE_LOG>
 
 ===GRADE BREAKDOWN===
---- FORMAT A (flags = 0, or valid TR, or flags 0–4 without TR — no score penalty):
-- Rubric Score: 100 / 100
-- Reflected Score: 100 / 100
-- Passing Threshold: 75% = 75 / 100
-- Result: PASS
-- AI Label: Mostly Human
-- CDRP Flags: 2
-- Transparency Report: Not present
-CRITERIA:
-- Following Instructions & Formatting: 25/25 — Excellent — Header: Baroro, Benitez, Bucarile, Cadorna, Carias listed; PDF format used.
-- Physical & Environmental Security Analysis: 25/25 — Excellent — Part 1: Correct FAR/FRR/EER definitions; Positive Pressure HVAC recommended; Double-Conversion Online UPS cited. No Reference — domain knowledge applied.
-- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Part 2/3: Containerization described; EDR behavioral monitoring argued; 4-step hardening process outlined. No Reference — domain knowledge applied.
-- AI Originality & Group Effort: 25/25 — Excellent — Reflection: 2-question synthesis provided; links wall sockets to firewall failure.
-- TOTAL: 100/100 — Math verified: 25+25+25+25 = 100
-
-===STUDENT FEEDBACK===
-Your group provided an exceptionally detailed analysis of the Aegis Healthcare scenario, particularly in the explanation of the HVAC positive pressure solution and its impact on dust mitigation. The justification for using a double-conversion online UPS was well-supported by the technical distinction between dirty power and stable AC output, showing a strong grasp of power infrastructure. The MDM strategy effectively resolved the privacy dilemma regarding the physician's stolen phone by detailing how containerization isolates corporate data while leaving personal files untouched.
-
-While your hardening steps are logical and follow standard security principles, the protocol would benefit from more technical specificity to make it a ready-to-implement guide. You could improve this section by listing specific network ports to be closed or identifying common Windows services like the Print Spooler that should be disabled in a healthcare workstation environment. Providing these concrete examples would transition the report from a high-level strategy to a practical implementation document.
-
-This is a strong submission that demonstrates a clear understanding of how physical infrastructure underpins digital security. Your collaborative effort is evident in the cohesive nature of the multi-part responses and the depth of the reflection section.
-
-Your analysis and reflection contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include:
-
-""This occurs regardless of whether that specific attack has been seen before.""
-(Category C — the phrase uses a generic qualifier regarding attack detection that is not anchored to the specific EDR tools or the Aegis scenario mentioned in the surrounding text.)
-
-""A compromised physical environment means the most expensive digital defenses you have are already sitting on a cracked foundation.""
-(Category A — the ""cracked foundation"" metaphor serves as a rhetorical amplifier for the CIA Triad argument without requiring any specific facts from the Aegis Healthcare case to be valid.)",success,Mostly Human,2
-RON JHON KURT DIEGO,100.0,100,100.00%,"<AI_DETECTION_EVIDENCE_LOG>
-PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
-CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
-                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
-1. SENTENCE: ""Working in a 5-person team helped us evaluate the physical security challenges more comprehensively.""
-   CONTEXT: ""Reflection 2. >> Working in a 5-person team helped us evaluate the physical security challenges more comprehensively. << Each member was""
-2. SENTENCE: ""Cybersecurity is not only about firewalls and antivirus.""
-   CONTEXT: ""understand that >> Cybersecurity is not only about firewalls and antivirus. << Physical controls, employee""
-3. SENTENCE: ""A physical lock fails, an unauthorized person could enter the server room and directly access or damage the servers.""
-   CONTEXT: ""example, if >> a physical lock fails, an unauthorized person could enter the server room and directly access or damage the servers. << This would affect""
-</AI_DETECTION_EVIDENCE_LOG>
-
-===GRADE BREAKDOWN===
-- Rubric Score: 100 / 100
-- Reflected Score: 100 / 100
-- Passing Threshold: 75% = 75 / 100
-- Result: PASS
-- AI Label: Human Written
-- CDRP Flags: 0
-- Transparency Report: Not present
-CRITERIA:
-- Following Instructions & Formatting: 25/25 — Excellent — Portfolio #10: Discussion on Physical Security Challenges: 5 members listed (Alex De Rueda, Carl Lowell B. Dela Pena, Niel Crisostomo, Ron Jhon Kort Diego, Steve Marion Chan)
-- Physical & Environmental Security Analysis: 25/25 — Excellent — Part 1: Facility Controls: Correct explanation of FAR/FRR/EER and Positive Pressure tied to Aegis scenario
-- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Part 2: Endpoint Protection: MDM containerization and selective remote wipe correctly identified
-- AI Originality & Group Effort: 25/25 — Excellent — Reflection: Comprehensive group synthesis of physical/digital overlaps provided
-- TOTAL: 100/100 — Math verified: 25+25+25+25 = 100
-
-===STUDENT FEEDBACK===
-You demonstrated an excellent understanding of the Aegis scenario by correctly identifying how a selective remote wipe within an MDM container solves the privacy conflict regarding the doctor's personal photos. Your explanation of physical security in Part 1 is particularly strong, specifically where you link the concept of positive pressure in the HVAC system to the prevention of dust accumulation from the nearby construction. The technical definitions for biometric accuracy (FAR, FRR, and EER) are accurately applied to the server room context in the Facility Controls section, showing a high level of technical comprehension.
-
-The workstation hardening protocol you outlined in Part 3 is logical and follows the principle of least privilege effectively. While your response is comprehensive, you could further enhance future reports by specifying the types of physical shielding materials, such as Faraday cages or specialized foils, used to mitigate the TEMPEST emissions you mentioned in the Data Interception section. Overall, your group provided a cohesive and technically sound strategy that addresses all the vulnerabilities identified in the Aegis Healthcare case.
-
-Your reflection on the ""Outer Shell"" concept shows a solid grasp of how physical and digital security layers must work in tandem to protect the CIA Triad. Your group's ability to divide the complex scenario into specialized focus areas resulted in a high-quality submission.",success,Human Written,0
-ANDREE DAVE TEODORO,60.0,100,60.00%,"<AI_DETECTION_EVIDENCE_LOG>
-PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
-CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
-                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
-1. SENTENCE: ""Operating systems always ship with broad background software components activated by default, such as remote access features or network print utilities.""
-   CONTEXT: ""Hardening Steps: 1. >> Operating systems always ship with broad background software components activated by default, such as remote access features or network print utilities. << Each active background""
-2. SENTENCE: ""Each active background process increases the system attack surface because it leaves an unmonitored opening that an exploit can use to compromise the host.""
-   CONTEXT: ""print utilities. >> Each active background process increases the system attack surface because it leaves an unmonitored opening that an exploit can use to compromise the host. << Since an unauthorized""
-3. SENTENCE: ""Different people on the team picked up on different things.""
-   CONTEXT: ""working alone? - >> Different people on the team picked up on different things. << The person thinking""
-4. SENTENCE: ""Working in a group also means reasoning has to be explained and defended out loud, which forces the team to catch gaps that might get overlooked when working alone.""
-   CONTEXT: ""complete answer. >> Working in a group also means reasoning has to be explained and defended out loud, which forces the team to catch gaps that might get overlooked when working alone. << The Aegis scenario""
-</AI_DETECTION_EVIDENCE_LOG>
-
-===GRADE BREAKDOWN===
-- Rubric Score: 85 / 100
+- Rubric Score: 93 / 100
 - Reflected Score: 60 / 100
-
 - Passing Threshold: 75% = 75 / 100
 - Result: FAIL
 - AI Label: Mostly AI
 - CDRP Flags: 4
 - Transparency Report: Not present
 CRITERIA:
-- Following Instructions & Formatting: 20/25 — Good — Aegis_Healthcare_Report.pdf: All parts complete and names listed, but failed to remove instructional headers (Objectives, Background, Instructions).
-- Physical & Environmental Security Analysis: 25/25 — Excellent — Part 1: Correctly defines FAR/FRR/EER and recommends double-conversion online UPS and FM-200 clean agents.
-- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Part 2: Detailed explanation of MDM containerization for selective remote wipe and EDR behavioral monitoring for fileless malware.
-- AI Originality & Group Effort: 15/25 — Needs Improvement — Reflection and Hardening sections: Contains several instances of contextually detached rhetorical polish and highly generic phrasing.
-- TOTAL: 85/100 — Math verified: 20+25+25+15 = 85
+- Following Instructions & Formatting: 25/25 — Excellent — submission: group member names field + Acbang, Alcantara, Amulong, Apere, Bacos
+- Physical & Environmental Security Analysis: 25/25 — Excellent — submission: Biometrics and Mantraps field + EER (FAR=FRR)
+- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — submission: The BYOD Dilemma field + remote wipe corporate container
+- AI Originality & Group Effort: 18/25 — Good — submission: Reflection field + generic collaboration description
+- TOTAL: 93/100 — Math verified: 25+25+25+18 = 93
+===STUDENT FEEDBACK===
+You demonstrated a high level of technical proficiency in your analysis of physical security controls and endpoint hardening strategies. Your explanation of biometric accuracy in the Biometrics and Mantraps field was particularly strong, correctly identifying the Equal Error Rate as the critical balancing point for server room security. You also correctly recommended a double-conversion online UPS to address the power anomalies described in the Aegis Healthcare scenario. No Reference — domain knowledge applied.
+
+While your technical answers are excellent, your reflection in Part 3 would be improved by including specific examples of how your group members collaborated on the report. To reach the highest rubric band for group effort, you should describe specific task allocations or how the team resolved technical disagreements during the consulting process. Providing these concrete details helps demonstrate the unique synthesis of ideas that occurred within your specific group.
+
+Your reflection and technical analysis contain language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+
+""Working in a 5-person team allowed us to analyze the problem from multiple perspectives instead of relying on a single viewpoint.""
+(Category E — The sentence uses a generic multiple perspectives versus single viewpoint contrast that functions as a universal benefit of teamwork without referencing specific challenges discussed by the members.)
+
+""This resulted in a more well-rounded and accurate analysis compared to working alone, where some issues or solutions might have been overlooked.""
+(Category E — Removing the reference to working alone leaves a standard evaluative conclusion that could apply to any group project regardless of the subject matter.)
+
+""This approach separates corporate data into a secure, encrypted container within the phone, completely isolated from personal apps and files.""
+(Category E — The description of containerization uses technical definitions of secure containers and isolation from personal apps without any specific details about the doctor's phone or patient records mentioned in the scenario.)
+
+""This eliminates the risk of data leakage while also respecting the employee’s personal privacy.""
+(Category E — The eliminates X while also respecting Y structure serves as a portable moral and operational conclusion that fits any BYOD policy discussion without modification.)
+
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly AI,4
+MARC MANUEL MARQUEZ,-,-,100,,No attachments submitted.,skipped_no_content,,
+STEVE MARION CHAN,-,-,100,,No attachments submitted.,skipped_no_content,,
+MARY DENISE HARDER,-,-,100,,No attachments submitted.,skipped_no_content,,
+GENEVIEVE GAMAY,95,95,100,95.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""Biometric authentication relies on statistical thresholds rather than perfect binary matching.""
+   CONTEXT: ""investment to board >> Biometric authentication relies on statistical thresholds rather than perfect binary matching. << False Accept Rate""
+2. SENTENCE: ""Physical security is basically the outer shell of the CIA triad because if someone can just walk right up to a machine, all your expensive digital defenses don't even matter anymore.""
+   CONTEXT: ""Reflection 1. Why >> Physical security is basically the outer shell of the CIA triad because if someone can just walk right up to a machine, all your expensive digital defenses don't even matter anymore. << We always talk""
+3. SENTENCE: ""It made us realize that cybersecurity isn't just a technical problem for one person to solve, but it actually needs a whole team to catch all the different blind spots.""
+   CONTEXT: ""different blind spots >> It made us realize that cybersecurity isn't just a technical problem for one person to solve, but it actually needs a whole team to catch all the different blind spots. << Submission Format""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 95 / 100
+- Reflected Score: 95 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Mostly Human
+- CDRP Flags: 3
+- Transparency Report: Present and reflective
+CRITERIA:
+- Following Instructions & Formatting: 20/25 — Good — Top of doc: 5 names listed (Dizor, Gamay, Harder, Japag, Lambojon) but retained prompt headers/instructions.
+- Physical & Environmental Security Analysis: 25/25 — Excellent — Part 1: EER ≤ 0.001% recommendation and detailed positive pressure explanation.
+- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Part 2: Containerization ""digital vault"" analogy and PowerShell-based fileless malware analysis.
+- AI Originality & Group Effort: 25/25 — Excellent — AI Use Transparency Report: detailed logs for 11 specific prompts across Claude and Gemini.
+- TOTAL: 95/100 — Math verified: 20+25+25+25 = 95
+===STUDENT FEEDBACK===
+You have submitted a technically robust and well-reasoned report that demonstrates a high level of understanding regarding the intersection of physical and digital security. Your analysis of biometric error rates is particularly strong, especially your specific recommendation for an EER of ≤ 0.001% to balance security with operational efficiency in the Aegis server room. The explanation of how EDR monitors behavioral anomalies like PowerShell scraping passwords provides a very clear justification for moving away from legacy signature-based antivirus.
+
+To further improve your submission formatting, ensure that you remove all instructional text and background headers from the original activity prompt before final submission. While your content is excellent, a professional consulting report should only contain your team's original analysis and findings. You might also consider expanding on the specific hardware requirements for the Double-Conversion Online UPS to ensure it can handle the total wattage of the database servers mentioned in the scenario.
+
+This is a very strong portfolio entry that shows excellent collaboration and a clear grasp of enterprise-level security hardening. Keep maintaining this level of technical detail in your future work.
+
+Thank you for including your Transparency Report and for being upfront about your use of AI tools in this submission.",success,Human Written,0
+ERVING IAN MACAPAGAL,-,-,100,,No attachments submitted.,skipped_no_content,,
+MIKYLA REIGN VIDAMO,-,-,100,,No attachments submitted.,skipped_no_content,,
+CARL LOWELL DELA PENA,-,-,100,,No attachments submitted.,skipped_no_content,,
+GABRIEL JOHN LAMBOJON,-,-,100,,No attachments submitted.,skipped_no_content,,
+PRIAM REYES,-,-,100,,No attachments submitted.,skipped_no_content,,
+PAULA PAREDES,90,90,100,90.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged phrase] << [3 words after]""):
+1. SENTENCE: ""No matter how advanced a company’s cybersecurity tools are, they become useless if attackers can directly access the hardware or disrupt the infrastructure supporting it.""
+   CONTEXT: ""access or damage. >> No matter how advanced a company’s cybersecurity tools are, they become useless if attackers can directly access the hardware or disrupt the infrastructure supporting it. << These physical failures""
+2. SENTENCE: ""This shows that cybersecurity does not only depend on software and encryption, but also on protecting the physical environment where systems operate.""
+   CONTEXT: ""security operations. This >> This shows that cybersecurity does not only depend on software and encryption, but also on protecting the physical environment where systems operate. << Even the strongest""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 90 / 100
+- Reflected Score: 90 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Mostly Human
+- CDRP Flags: 2
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 20/25 — Good — Submission: Headers; included prompt text (Objectives/Background) despite instruction to remove headers.
+- Physical & Environmental Security Analysis: 25/25 — Excellent — Submission: Part 1; correctly identifies positive pressure for dust and double-conversion UPS for brownouts.
+- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Submission: Part 2; provides detailed explanation of containerization for remote wipes and EDR behavioral monitoring.
+- AI Originality & Group Effort: 20/25 — Good — Submission: Reflection; group synthesis is present but contains detached rhetorical polish in the concluding remarks.
+- TOTAL: 90/100 — Math verified: 20+25+25+20 = 90
 
 ===STUDENT FEEDBACK===
-Your technical analysis of facility controls and endpoint defenses is exceptionally strong, particularly in your explanation of how a double-conversion online UPS protects against brownouts and how positive pressure prevents dust accumulation in the server room. You correctly identified the value of MDM containerization in Part 2, specifically noting how it allows for a selective remote wipe of patient records without compromising a doctor's personal photos. These sections demonstrate a high level of technical proficiency and a clear understanding of the Aegis Healthcare scenario.
+You demonstrated a very strong technical grasp of physical and environmental security by correctly identifying that a double-conversion online UPS is the necessary architecture to protect Aegis from the ""dirty power"" caused by brownouts. Your explanation of how positive pressure HVAC systems solve the dust accumulation issue was precise and directly addressed the construction-related risks mentioned in the scenario. Additionally, your proposal for MDM containerization clearly explained how Aegis can protect healthcare data on personal devices without infringing on employee privacy during a remote wipe.
 
-However, your submission failed to follow the formatting instruction to remove all headers and rubric text from the final document, as the objectives and background sections remain in the file. Additionally, while your technical definitions are accurate, the hardening and reflection sections rely heavily on highly formal, generic phrasing that lacks the specific ""group voice"" or unique synthesis required for full marks in originality. For future portfolios, ensure you strip all instructional text before submission and provide a Transparency Report if you use AI tools to draft your definitions.
+To improve the formatting of future portfolios, ensure that you remove all instructional text, objectives, and background scenarios from the final document as requested in the submission requirements. While your technical analysis was excellent, the reflection section relied on some generic phrasing to summarize the importance of physical security. For your next submission, try to anchor your concluding thoughts more deeply to the specific healthcare context of Aegis to avoid a detached or overly formal tone.
 
-To improve, focus on anchoring your reflections to specific moments in your group discussion rather than using broad statements about the benefits of teamwork. You should also double-check the final formatting requirements to ensure only your group's original report content is included in the PDF.
+Overall, this was a comprehensive and well-reasoned consulting report that effectively balanced physical infrastructure needs with modern endpoint protection strategies. Your team collaboration is evident in the thoroughness of the multi-step hardening process and the clear differentiation between traditional antivirus and EDR systems.
+
+Your reflection contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+""[No matter how advanced a company’s cybersecurity tools are, they become useless if attackers can directly access the hardware or disrupt the infrastructure supporting it.]""
+(Category E — the ""No matter how X, they Y"" structure delivers a universal verdict on physical security that remains valid regardless of the specific case study or industry.)
+""[This shows that cybersecurity does not only depend on software and encryption, but also on protecting the physical environment where systems operate.]""
+(Category A — the ""does not only X, but also Y"" rhetorical flourish amplifies a general principle of security without integrating specific technical evidence from the preceding analysis.)
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly Human,2
+KURT MICHAEL MIRAFELIX,-,-,100,,No attachments submitted.,skipped_no_content,,
+KURT CADORNA,-,-,100,,No attachments submitted.,skipped_no_content,,
+IAN LEMUEL VERGARA,-,-,100,,No attachments submitted.,skipped_no_content,,
+LLOYD PERIDO,-,-,100,,No attachments submitted.,skipped_no_content,,
+JASMYN JAPAG,-,-,100,,No attachments submitted.,skipped_no_content,,
+JOHN LESTER ACBANG,-,-,100,,No attachments submitted.,skipped_no_content,,
+NEIL ANGELO CRISOSTOMO,95,95,100,95.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+No CDRP candidates identified.
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 95 / 100
+- Reflected Score: 95 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Human Written
+- CDRP Flags: 0
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 20/25 — Good — Submission: retained 'Objectives', 'Background / Scenario', and 'Instructions' headers from the activity file.
+- Physical & Environmental Security Analysis: 25/25 — Excellent — Part 1: Biometrics — 'The lower the EER, the more accurate and reliable the biometric system is.'
+- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Part 2: EPP vs. EDR — 'EDR is stronger because it monitors the behavior of endpoints... to stop modern ""Fileless Malware""'.
+- AI Originality & Group Effort: 25/25 — Excellent — Reflection: Question 1 — 'A firewall cannot protect a database server from voltage drops or brownouts.'
+- TOTAL: 95/100 — Math verified: 20+25+25+25 = 95
+===STUDENT FEEDBACK===
+Your report provides a technically precise analysis of the Aegis scenario, particularly in the explanation of biometric accuracy and the physics of HVAC positive pressure. You and your team correctly identified the danger of Class A water suppression for electronics and provided a sound recommendation for a double conversion online UPS to mitigate power anomalies. The reflection section effectively links physical security failures to the specific components of the CIA Triad, demonstrating a high level of conceptual synthesis.
+
+While the content of your report is excellent, you did not follow the specific formatting instruction to remove the activity headers and background text from your final submission. Your document still contains the original Objectives, Background and Scenario, and Instructions sections, which should have been deleted to present a professional consulting report. In future portfolios, please ensure you only submit your group original responses and analysis to meet the professional formatting standards of the college. This will ensure your work stands out as an original consulting product rather than a filled out worksheet.
+
+This is a very strong technical submission that shows a clear understanding of how physical and digital security layers interact. Keep up the thoroughness in your technical justifications.",success,Human Written,0
+CHARLIZE ELLAINE DIZOR,-,-,100,,No attachments submitted.,skipped_no_content,,
+KING JUSTIN BARORO,-,-,100,,No attachments submitted.,skipped_no_content,,
+TRISHA CARIAS,60,90,100,60.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""Physical security is called the outer shell of the CIA Triad because it is the one layer that everything else depends on.""
+   CONTEXT: ""Reflection 1. >> Physical security is called the outer shell of the CIA Triad because it is the one layer that everything else depends on. << Confidentiality, Integrity, and""
+2. SENTENCE: ""Physical security isn't a layer on top of the CIA Triad but it's the ground the whole thing is built on.""
+   CONTEXT: ""trivially bypassable. >> Physical security isn't a layer on top of the CIA Triad but it's the ground the whole thing is built on. << A compromised physical""
+3. SENTENCE: ""A compromised physical environment means the most expensive digital defenses you have are already sitting on a cracked foundation.""
+   CONTEXT: ""built on. >> A compromised physical environment means the most expensive digital defenses you have are already sitting on a cracked foundation. << 2. Working as""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 90 / 100
+- Reflected Score: 60 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: FAIL
+- AI Label: Mostly AI
+- CDRP Flags: 3
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 25/25 — Excellent — Header: Baroro, Benitez, Bucarile, Cadorna, Carias listed.
+- Physical & Environmental Security Analysis: 25/25 — Excellent — Part 1: Double-Conversion Online UPS and Positive Pressure HVAC correctly detailed.
+- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Part 2: Containerization and EDR behavioral monitoring vs signatures accurately explained.
+- AI Originality & Group Effort: 15/25 — Needs Improvement — Reflection 1 contains multiple contextually detached rhetorical patterns.
+- TOTAL: 90/100 — Math verified: 25+25+25+15 = 90
+===STUDENT FEEDBACK===
+You demonstrated an excellent technical understanding of physical and environmental controls, particularly in your explanation of how positive pressure in an HVAC system prevents dust accumulation. Your analysis of power anomalies in Part 1 correctly identified the specific risks of brownouts and provided a technically sound recommendation for double-conversion online UPS architecture. The description of MDM containerization in Part 2 was also highly effective, clearly showing how it resolves the privacy dilemma for the physician's stolen device.
+
+The primary area for improvement is the presence of highly formalized, generic phrasing in your reflection that lacks specific anchors to the Aegis Healthcare scenario. While your technical sections were strong, the concluding analysis relied on broad metaphors rather than continuing the specific case-based reasoning seen earlier in the report. For future submissions, ensure that every paragraph of your reflection directly references specific facts or incidents from the provided case study to maintain a consistent student voice.
+
+This was a very strong technical submission that clearly met the learning objectives regarding facility and endpoint security. Focus on maintaining consistent originality in your reflective writing to ensure your group's unique perspective is fully captured.
+
+Your reflection contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+
+""Physical security is called the outer shell of the CIA Triad because it is the one layer that everything else depends on.""
+(Category E — the ""one layer that everything else depends on"" is a generic structural claim that defines a hierarchy without referencing the specific Aegis infrastructure.)
+
+""Physical security isn't a layer on top of the CIA Triad but it's the ground the whole thing is built on.""
+(Category A — the ""isn't X... but it's Y"" construction creates a rhetorical contrast that remains valid for any security context, independent of the Aegis case study.)
+
+""A compromised physical environment means the most expensive digital defenses you have are already sitting on a cracked foundation.""
+(Category A — the ""most expensive digital defenses... sitting on a cracked foundation"" metaphor is a portable rhetorical flourish that adds emphasis without adding scenario-specific facts.)
+
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly AI,3
+ALCRIS AMULONG,-,-,100,,No attachments submitted.,skipped_no_content,,
+SHANAIA LEE BACOS,84,94,100,84.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""This resulted in a more well-rounded and accurate analysis compared to working alone, where some issues or solutions might have been overlooked.""
+   CONTEXT: ""the Aegis scenario. >> This resulted in a more well-rounded and accurate analysis compared to working alone, where some issues or solutions might have been overlooked. << [end of text]""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 94 / 100
+- Reflected Score: 94 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Mostly Human
+- CDRP Flags: 1
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 20/25 — Good — Portfolio #10 (Student included the entire instruction set and background text despite the requirement to remove all headers).
+- Physical & Environmental Security Analysis: 25/25 — Excellent — Part 1 (Accurate explanation of EER as the balancing point of FAR and FRR; correct recommendation of double-conversion UPS for dirty power). No Reference — domain knowledge applied.
+- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Part 2 (Clear logic for MDM containerization to enable selective remote wipes; strong argument for EDR behavioral monitoring over EPP signatures). No Reference — domain knowledge applied.
+- AI Originality & Group Effort: 24/25 — Excellent — Reflection (Synthesis of physical security as the outer shell of the CIA Triad is well-articulated, though teamwork reflection contains generic phrasing).
+- TOTAL: 94/100 — Math verified: 20+25+25+24 = 94
+
+===STUDENT FEEDBACK===
+You demonstrated a high level of technical proficiency in your analysis of the Aegis Healthcare scenario. Your explanation of the mathematics behind biometric accuracy was particularly strong, correctly identifying that a lower Equal Error Rate indicates a more reliable system for sensitive environments like a server room. You also provided a very clear and logical justification for using a double-conversion online UPS to handle the specific ""dirty power"" issues mentioned in the case study.
+
+To improve your future submissions, please ensure you follow all formatting constraints, as your document currently retains the full instruction and background text which should have been removed for a professional report. While your hardening steps are correct, you could further enhance this section by naming specific services or common ports that should be disabled in a healthcare workstation environment. Additionally, your teamwork reflection would be more impactful if you linked the benefits of collaboration directly to a specific technical breakthrough your group achieved during the discussion.
+
+This is a very strong portfolio that shows you have a firm grasp of how physical and endpoint security measures must work together to protect sensitive data. Keep up the thorough work in your technical explanations.
 
 Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
 
-  ""Operating systems always ship with broad background software components activated by default, such as remote access features or network print utilities.""
-  (Category A — the sentence introduces the concept of background services using a generic technical description that does not reference Aegis or healthcare)
+""This resulted in a more well-rounded and accurate analysis compared to working alone, where some issues or solutions might have been overlooked.""
+(Category E — The phrasing ""resulted in a more well-rounded and accurate analysis"" is a generic academic summary of teamwork that does not require any of the specific technical concepts discussed in the Aegis scenario to remain logically sound.)
 
-  ""Each active background process increases the system attack surface because it leaves an unmonitored opening that an exploit can use to compromise the host.""
-  (Category A — the statement defines attack surface risk using universal cybersecurity terminology that remains valid regardless of the specific facility being analyzed)
+[System Note: A 10-point penalty was applied for a late submission.]",success,Mostly Human,1
+RON JHON KURT DIEGO,100,100,100,100.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""The lower the EER, the more accurate and reliable the biometric system is.""
+   CONTEXT: ""properly. Lastly, >> The lower the EER, the more accurate and reliable the biometric system is. << For Aegis, a""
+2. SENTENCE: ""Clean agents can suppress fire without leaving residue and without damaging electronic equipment.""
+   CONTEXT: ""Inergen. Clean >> Clean agents can suppress fire without leaving residue and without damaging electronic equipment. << This makes them""
+3. SENTENCE: ""A surge is a sudden increase in voltage.""
+   CONTEXT: ""blackout. A >> A surge is a sudden increase in voltage. << It can damage""
+4. SENTENCE: ""Containerization separates corporate data from personal data by placing work-related files, apps, and records inside a protected corporate container or sandbox.""
+   CONTEXT: ""with containerization. >> Containerization separates corporate data from personal data by placing work-related files, apps, and records inside a protected corporate container or sandbox. << This solves the""
+5. SENTENCE: ""EDR is stronger because it monitors the behavior of endpoints.""
+   CONTEXT: ""signatures. EDR >> EDR is stronger because it monitors the behavior of endpoints. << Instead of only""
+6. SENTENCE: ""All unused services should be turned off.""
+   CONTEXT: ""services All >> All unused services should be turned off. << Unnecessary services can""
+7. SENTENCE: ""Physical security is considered the outer shell of the CIA Triad because it protects the actual systems, devices, and facilities where data is stored and processed.""
+   CONTEXT: ""Triad? Physical >> Physical security is considered the outer shell of the CIA Triad because it protects the actual systems, devices, and facilities where data is stored and processed. << Even if Aegis""
+</AI_DETECTION_EVIDENCE_LOG>
 
-  ""Different people on the team picked up on different things.""
-  (Category E — this opening sentence for the reflection uses a broad, non-specific observation about team dynamics that contains no evidence of the group's actual discussion)
+===GRADE BREAKDOWN===
+--- FORMAT A (flags = 0, or valid TR, or flags 0–4 without TR — no score penalty):
+- Rubric Score: 100 / 100
+- Reflected Score: 100 / 100
 
-  ""Working in a group also means reasoning has to be explained and defended out loud, which forces the team to catch gaps that might get overlooked when working alone.""
-  (Category E — the sentence provides a theoretical justification for teamwork that does not depend on the specific challenges of the Aegis scenario to be correct)
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Human Written
+- CDRP Flags: 0
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 25/25 — Excellent — Portfolio #10: names: Alex De Rueda, Carl Lowell B. Dela Pena, Niel Crisostomo, Ron Jhon Kort Diego, Steve Marion Chan.
+- Physical & Environmental Security Analysis: 25/25 — Excellent — Part 1: ""Aegis should replace the water sprinklers with a clean agent fire suppression system, such as FM-200 or Inergen.""
+- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Part 2: ""Aegis should implement a Mobile Device Management solution with containerization.""
+- AI Originality & Group Effort: 25/25 — Excellent — Reflection: ""One member was assigned to analyze facility access controls, another focused on fire and HVAC safety...""
+- TOTAL: 100/100 — Math verified: 25+25+25+25 = 100
+===STUDENT FEEDBACK===
+You provided an exceptionally detailed analysis that perfectly integrates the Aegis Healthcare scenario into every technical explanation. Your description of how positive pressure prevents construction dust from entering the server racks is a standout example of applying theory to the case study provided in the background. The group reflection clearly outlines a collaborative division of labor, which demonstrates strong teamwork and a comprehensive understanding of how physical and digital security layers overlap.
 
-Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly AI,4
-MARIZ NEPOMUCENO,0.0,100,0.00%,"<AI_DETECTION_EVIDENCE_LOG>
+While your technical definitions are highly accurate, you could further enhance the comparison between EPP and EDR by providing a specific example of a fileless malware attack, such as a malicious script executed via PowerShell. This would add even more depth to your argument for behavioral monitoring in the Aegis environment. Additionally, ensure consistent grammar in your explanations, particularly in the EDR section of Part 2, to maintain a professional tone throughout the report.
+
+This is a high-quality submission that shows a clear grasp of data center protection and mobile security. Keep up this level of detail in your future portfolio entries.",success,Human Written,0
+ANDREE DAVE TEODORO,98,98,100,98.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""A mantrap is a small secured room with two interlocking doors where only one person can enter at a time after identity verification.""
+   CONTEXT: ""biometric scanner. >> A mantrap is a small secured room with two interlocking doors where only one person can enter at a time after identity verification. << This prevents unauthorized""
+2. SENTENCE: ""Positive pressure means the air pressure inside the room is higher than outside, so when doors open, clean air flows outward instead of dusty air flowing inward.""
+   CONTEXT: ""server room. >> Positive pressure means the air pressure inside the room is higher than outside, so when doors open, clean air flows outward instead of dusty air flowing inward. << This prevents dust""
+3. SENTENCE: ""Operating systems always ship with broad background software components activated by default, such as remote access features or network print utilities.""
+   CONTEXT: ""Hardening Steps: >> Operating systems always ship with broad background software components activated by default, such as remote access features or network print utilities. << Each active background""
+4. SENTENCE: ""Different people on the team picked up on different things.""
+   CONTEXT: ""working alone? >> Different people on the team picked up on different things. << The person thinking""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 98 / 100
+- Reflected Score: 98 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Human Written
+- CDRP Flags: 0
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 23/25 — Good — Aegis_Healthcare_Report: Retained prompt text (Objectives, Background, Instructions) despite instructions to remove headers.
+- Physical & Environmental Security Analysis: 25/25 — Excellent — Aegis_Healthcare_Report: Correctly defined FAR/FRR/EER and recommended double-conversion online UPS.
+- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Aegis_Healthcare_Report: Detailed MDM containerization and EDR behavioral monitoring.
+- AI Originality & Group Effort: 25/25 — Excellent — Aegis_Healthcare_Report: Reflection specifically cites the Aegis brownout and tailgating incidents.
+- TOTAL: 98/100 — Math verified: 23+25+25+25 = 98
+===STUDENT FEEDBACK===
+Your group provided a very high level of technical detail, particularly in the explanation of biometric mathematics and UPS architectures. Your analysis of MDM containerization correctly identifies the solution to the privacy dilemma regarding personal files by explaining the separation of workspaces. The hardening steps are exceptionally well-integrated into the Aegis scenario, showing a clear understanding of how the physical breaches mentioned in the background necessitate specific digital hardening measures.
+
+The submission unfortunately includes the original activity instructions, objectives, and background text which should have been removed according to the submission format rules. This makes the document longer than necessary and deviates from the requested professional report format. To improve your formatting score in future portfolios, ensure you submit only your group's original analysis and responses.
+
+This was a strong collaborative effort that successfully bridged the gap between physical facility controls and endpoint security. Keep up the rigorous approach to technical definitions and scenario application.",success,Human Written,0
+ZARETH DAVE BUCARILE,-,-,100,,No attachments submitted.,skipped_no_content,,
+MARIZ NEPOMUCENO,0,85,100,0.00%,"<AI_DETECTION_EVIDENCE_LOG>
 PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
 CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
                            CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
 1. SENTENCE: ""Physical security is universally considered the 'outer shell' of the CIA Triad because it serves as the foundational layer upon which every digital defense ultimately depends.""
-   CONTEXT: ""unified response) 1. >> Physical security is universally considered the 'outer shell' of the CIA Triad because it serves as the foundational layer upon which every digital defense ultimately depends. << Before any software,""
-2. SENTENCE: ""The initial step in minimizing the endpoint vulnerability surface requires the absolute deactivation of all non-essential background software applications and components.""
-   CONTEXT: ""Unnecessary Services The >> The initial step in minimizing the endpoint vulnerability surface requires the absolute deactivation of all non-essential background software applications and components. << For example, services""
-3. SENTENCE: ""Mitigating access risk requires immediate remediation of factory-set default accounts alongside strict user role enforcement.""
-   CONTEXT: ""Credential Management: Mitigating >> Mitigating access risk requires immediate remediation of factory-set default accounts alongside strict user role enforcement. << All default system""
-4. SENTENCE: ""The final step ensures full visibility and operational tracking across the distributed infrastructure.""
-   CONTEXT: ""Local Logging: The >> The final step ensures full visibility and operational tracking across the distributed infrastructure. << Workstations must be""
+   CONTEXT: ""unified response) >> Physical security is universally considered the 'outer shell' of the CIA Triad because it serves as the foundational layer upon which every digital defense ultimately depends. << Before any software,""
+2. SENTENCE: ""Before any software, firewall rule, or encryption protocol can do its job, the physical environment housing those systems must first be secured.""
+   CONTEXT: ""ultimately depends. >> Before any software, firewall rule, or encryption protocol can do its job, the physical environment housing those systems must first be secured. << Confidentiality, Integrity, and""
+3. SENTENCE: ""Confidentiality, Integrity, and Availability, the three core pillars of the triad, can all be simultaneously compromised the moment physical security fails, regardless of how sophisticated the digital defenses layered on top may be.""
+   CONTEXT: ""be secured. >> Confidentiality, Integrity, and Availability, the three core pillars of the triad, can all be simultaneously compromised the moment physical security fails, regardless of how sophisticated the digital defenses layered on top may be. << This understanding became""
+4. SENTENCE: ""Software firewalls operate exclusively at the logical layers of the operating system's network stack, inspecting and filtering network packets passing through the network interface.""
+   CONTEXT: ""these attacks. >> Software firewalls operate exclusively at the logical layers of the operating system's network stack, inspecting and filtering network packets passing through the network interface. << Hardware keyloggers capture""
 5. SENTENCE: ""The synthesis that came from five perspectives ultimately produced a more comprehensive and coherent consulting strategy than any single viewpoint could have delivered.""
-   CONTEXT: ""single viewpoint could >> The synthesis that came from five perspectives ultimately produced a more comprehensive and coherent consulting strategy than any single viewpoint could have delivered. << [end]""
+   CONTEXT: ""delivered. >> The synthesis that came from five perspectives ultimately produced a more comprehensive and coherent consulting strategy than any single viewpoint could have delivered. << [End of submission]""
 </AI_DETECTION_EVIDENCE_LOG>
 
 ===GRADE BREAKDOWN===
-- Rubric Score (before AI penalty): 93 / 100
+- Rubric Score (before AI penalty): 85 / 100
 - AI Penalty Applied: Score set to 0 — pervasive CDRP detected without Transparency Report
 - Reflected Score: 0 / 100
 - Passing Threshold: 75% = 75 / 100
@@ -380,28 +419,34 @@ CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submissio
 - CDRP Flags: 5
 - Transparency Report: Not present
 CRITERIA:
-- Following Instructions & Formatting: 23/25 — Good — Portfolio10_Nepomuceno: All group members listed and PDF format used, but Background and Instruction headers were retained despite instructions to remove them.
-- Physical & Environmental Security Analysis: 25/25 — Excellent — Portfolio10_Nepomuceno: Flawless explanation of EER in biometrics and the use of double-conversion online UPS for dirty power.
-- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Portfolio10_Nepomuceno: Compelling argument for EDR behavioral monitoring and clear 4-step hardening process.
-- AI Originality & Group Effort: 20/25 — Good — Portfolio10_Nepomuceno: Reflection addresses all prompts but relies on high-polish generic phrasing identified by CDRP.
-- TOTAL: 93/100 — Math verified: 23+25+25+20 = 93
+- Following Instructions & Formatting: 25/25 — Excellent — Submission: 5 group members listed (Macapagal, Marquez, Miano, Mirafelix, Nepomuceno); all parts complete.
+- Physical & Environmental Security Analysis: 25/25 — Excellent — Part 1: Correctly defines FAR/FRR/EER; recommends FM-200 and positive pressure; identifies double-conversion online UPS.
+- Endpoint & Mobile Defenses Strategy: 25/25 — Excellent — Part 2: Proposes MDM containerization for selective remote wipe; argues for EDR behavioral monitoring over AV signatures; Part 3: 4-step hardening included.
+- AI Originality & Group Effort: 10/25 — Poor — Reflection: Contains pervasive contextually detached rhetorical polish (CDRP) and generic phrasing lacking case-specific anchors.
+- TOTAL: 85/100 — Math verified: 25+25+25+10 = 85
+
 ===STUDENT FEEDBACK===
-Your group provided an exceptionally thorough technical analysis of the Aegis Healthcare scenario, particularly in your explanation of the UPS double-conversion architecture and the mathematical trade-offs between FAR and FRR. The recommendation for positive pressure HVAC systems to mitigate dust accumulation shows a strong grasp of the environmental safety objectives outlined in the portfolio. You also correctly identified the benefits of containerization in solving the BYOD remote wipe dilemma without infringing on employee privacy.
+You demonstrated a high level of technical proficiency in your analysis of the Aegis Healthcare scenario. Specifically, your explanation of the mathematics behind biometric accuracy in Part 1 was precise and correctly identified why a lower Equal Error Rate is critical for high-security environments. Your recommendation for a double-conversion online UPS architecture shows a strong understanding of how to isolate critical infrastructure from the ""dirty power"" issues mentioned in the background scenario.
 
-To improve future submissions, ensure that you strictly follow the formatting instructions regarding the removal of all prompt text and headers from the final document. While your technical descriptions are accurate, some sections in the hardening process and reflection rely on very formal, generalized language that lacks specific anchors to the Aegis facility. Integrating more direct references to the hospital's specific constraints or the doctor's stolen device within those analytical sections would strengthen the authenticity of your consulting report.
-
-Continue to apply this level of technical detail to your future cybersecurity projects, as your understanding of endpoint detection and response is well-developed. Focus on developing a more personalized reflective voice that captures the unique dynamics of your group's collaboration.
+While your technical sections are strong, the reflection section relies heavily on generic, formal language that lacks specific details about your group's internal collaborative process. To improve, you should ground your analysis in the specific context of the case study rather than using broad, portable definitions of security principles. Ensure that all concluding statements reference specific findings or debates that occurred during your group's consultation to demonstrate original synthesis.
 
 Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include:
+
 ""Physical security is universally considered the 'outer shell' of the CIA Triad because it serves as the foundational layer upon which every digital defense ultimately depends.""
-(Category E — the ""serves as the foundational layer"" metaphor provides an ethical verdict on physical security that remains valid in any infrastructure discussion without case-specific anchoring)
-""The initial step in minimizing the endpoint vulnerability surface requires the absolute deactivation of all non-essential background software applications and components.""
-(Category A — the ""requires the absolute deactivation"" construction creates a formal maxim that applies to any system hardening scenario without unique case details)
-""Mitigating access risk requires immediate remediation of factory-set default accounts alongside strict user role enforcement.""
-(Category A — the sentence uses a high-register ""requires immediate remediation"" construction to state a general security rule that does not depend on the Aegis scenario)
-""The final step ensures full visibility and operational tracking across the distributed infrastructure.""
-(Category D — the phrase ""ensures full visibility"" acts as a conclusion label for the step without referencing the specific logging mechanism mentioned in the context)
+(Category E — The phrase ""foundational layer upon which every digital defense ultimately depends"" functions as a universal ethical verdict that remains valid regardless of the specific Aegis Healthcare scenario.)
+
+""Before any software, firewall rule, or encryption protocol can do its job, the physical environment housing those systems must first be secured.""
+(Category E — The ""Before any X, Y, or Z can do its job"" construction creates a moral maxim about physical security that does not rely on the Aegis brownout or tailgating facts to be coherent.)
+
+""Confidentiality, Integrity, and Availability, the three core pillars of the triad, can all be simultaneously compromised the moment physical security fails, regardless of how sophisticated the digital defenses layered on top may be.""
+(Category E — Contrasting ""simultaneously compromised"" with ""sophisticated digital defenses"" serves as a rhetorical flourish that applies to any security breach and lacks specific mention of the Aegis database servers.)
+
+""Software firewalls operate exclusively at the logical layers of the operating system's network stack, inspecting and filtering network packets passing through the network interface.""
+(Category C — The sentence provides a detached technical definition of ""logical layers"" and ""network stack"" without anchoring the explanation to the specific workstation hardening steps mentioned earlier in the submission.)
+
 ""The synthesis that came from five perspectives ultimately produced a more comprehensive and coherent consulting strategy than any single viewpoint could have delivered.""
-(Category E — this closing sentence is a portable moral conclusion about teamwork that could be transplanted into any group project reflection without modification)",success,AI Generated,5
-ALIANDRY SUMABAT,,100,,,skipped_no_content,,
-JUSTINE EDWARD APERE,,100,,,skipped_no_content,,
+(Category E — The claim regarding the ""synthesis that came from five perspectives"" is a generic group-work conclusion that describes the process of collaboration without detailing a single specific insight gained from the Aegis case.)
+
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,AI Generated,5
+ALIANDRY SUMABAT,-,-,100,,No attachments submitted.,skipped_no_content,,
+JUSTINE EDWARD APERE,-,-,100,,No attachments submitted.,skipped_no_content,,

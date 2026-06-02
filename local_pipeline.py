@@ -127,6 +127,9 @@ async def process_submission(
             "name": profile["name"],
             "email": profile["email"],
             "max_score": config["max_score"],
+            "score": "-",                         
+            "rubric_score": "-",                  
+            "feedback": "No attachments submitted."
         }
 
     result = None
@@ -147,6 +150,11 @@ async def process_submission(
             if result:
                 cost_tracker.record(result)
                 rate_limiter.on_success()
+
+                if submission.get("late", False):
+                    original_score = result["score"]
+                    result["score"] = max(0, original_score - 10)
+                    result["feedback"] += "\n\n[System Note: A 10-point penalty was applied for a late submission.]"
                 break
         except Exception as e:
             logger.warning("🔄 Retry %d/%d for %s: %s", attempt+1, max_retries, profile["name"], e)
