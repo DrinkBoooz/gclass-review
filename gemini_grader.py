@@ -415,6 +415,97 @@ def _attach_usage(result: dict, response: object) -> dict:
 # Main public entry point
 # ---------------------------------------------------------------------------
 
+def grade_submission_batch(
+    client: genai.Client,
+    assignment_title: str,
+    rubric: str,
+    system_prompt: str,
+    students_data: list[dict],
+    max_score: int,
+    thinking_level: str = "minimal",
+) -> list[dict]:
+    """
+    Batches multiple student submissions into a single Gemini prompt using text delimiters,
+    preserving the complex textual output schema defined in the system prompt.
+    """
+    # 1. Construct the combined prompt with strict delimiter instructions
+    batch_prompt = (
+        "You are receiving a batch of student submissions. You must grade EACH student "
+        "individually according to the system prompt rules.\n\n"
+        "CRITICAL INSTRUCTION:\n"
+        "You must output your complete, fully-formatted response (starting with "
+        "<AI_DETECTION_EVIDENCE_LOG> and ending with ===STUDENT FEEDBACK===) for "
+        "EACH student. Separate each student's grading block with this exact delimiter:\n"
+        "@@@STUDENT:[Student Name]@@@\n\n"
+        "Do not output anything outside of these blocks.\n\n"
+    )
+
+    for student in students_data:
+        batch_prompt += f"@@@STUDENT:{student['profile']['name']}@@@\n"
+        batch_prompt += f"SUBMISSION:\n{student['content']}\n\n"
+
+    contents = [
+        types.Content(
+            role="user",
+            parts=[types.Part(text=batch_prompt)],
+        )
+    ]
+
+    try:
+        config = GenerateContentConfig(
+            system_instruction=f"{system_prompt}\n\nRUBRIC:\n{rubric}",
+            temperature=0.6,
+            thinking_config=ThinkingConfig(thinking_level=thinking_level),
+            # No response_mime_type / response_schema — free-form text output
+        )
+
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=contents,
+            config=config,
+        )
+
+        raw = response.text or ""
+
+        # 2. Parse the combined text response
+        results = []
+        # Split by the delimiter prefix
+        parts = raw.split("@@@STUDENT:")
+
+        for part in parts:
+            if not part.strip():
+                continue
+
+            # Find the end of the name delimiter
+            name_end = part.find("@@@")
+            if name_end == -1:
+                continue
+
+            student_name = part[:name_end].strip()
+            student_output = part[name_end + 3:].strip()
+
+            # 3. Pass the extracted block into the existing parsing logic
+            parsed_result = _parse_model_output(student_output, max_score)
+            parsed_result["name"] = student_name
+            results.append(parsed_result)
+
+        # 4. Handle usage tracking (applied to the first result as a proxy for the batch)
+        if results:
+            usage = getattr(response, "usage_metadata", None)
+            if usage:
+                results[0]["usage_metrics"] = {
+                    "prompt_tokens": getattr(usage, "prompt_token_count", 0),
+                    "completion_tokens": getattr(usage, "response_token_count", 0),
+                    "cached_tokens": getattr(usage, "cached_content_token_count", 0),
+                    "total_tokens": getattr(usage, "total_token_count", 0),
+                }
+
+        return results
+
+    except Exception as e:
+        logger.error("  ✗ Batch grading error: %s", e)
+        return []
+
 def grade_submission(
     client: genai.Client,
     assignment_title: str,

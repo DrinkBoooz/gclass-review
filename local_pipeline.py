@@ -9,13 +9,11 @@ Local async grading pipeline implementing Priority C:
 import asyncio
 import json
 import logging
-import time
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from classroom_handler import get_student_profile, collect_submission_content, post_draft_grade
-from gemini_grader import grade_submission
+from gemini_grader import grade_submission_batch
 
 logger = logging.getLogger("local_pipeline")
 
@@ -101,9 +99,9 @@ class DeadLetterQueue:
         logger.info("💀 Dead-letter queue flushed to %s", dl_path)
 
 
-async def process_submission(
-    idx: int,
-    submission: dict,
+async def process_batch(
+    batch_idx: int,
+    batch: list[dict],
     config: dict,
     classroom_service,
     drive_service,
@@ -114,81 +112,124 @@ async def process_submission(
     dry_run: bool,
     max_retries: int = 3,
 ):
-    submission_id = submission.get("id")
-    user_id = submission.get("userId")
-    profile = get_student_profile(classroom_service, config["course_id"], user_id)
-    student_content = collect_submission_content(submission, drive_service)
-    text = student_content.get("text", "")
+    students_data = []
+    skipped_results = []
 
-    if not text or text.startswith(("[NO ATTACHMENTS", "[COULD NOT EXTRACT", "[Binary", "[PDF contains no extractable")):
-        logger.warning("⏭ Skipping %s — no usable content.", profile["name"])
-        return {
-            "status": "skipped_no_content",
-            "name": profile["name"],
-            "email": profile["email"],
-            "max_score": config["max_score"],
-            "score": "-",                         
-            "rubric_score": "-",                  
-            "feedback": "No attachments submitted."
-        }
+    # 1. Gather all contents for the batch
+    for submission in batch:
+        submission_id = submission.get("id")
+        user_id = submission.get("userId")
+        profile = get_student_profile(classroom_service, config["course_id"], user_id)
+        student_content = collect_submission_content(submission, drive_service)
+        text = student_content.get("text", "")
 
-    result = None
+        if not text or text.startswith(("[NO ATTACHMENTS", "[COULD NOT EXTRACT", "[Binary", "[PDF contains no extractable")):
+            logger.warning("⏭ Skipping %s — no usable content.", profile["name"])
+            skipped_results.append({
+                "status": "skipped_no_content",
+                "name": profile["name"],
+                "email": profile["email"],
+                "max_score": config["max_score"],
+                "score": "-",
+                "rubric_score": "-",
+                "feedback": "No attachments submitted."
+            })
+            continue
+
+        students_data.append({
+            "submission_id": submission_id,
+            "profile": profile,
+            "content": text,
+            "late": submission.get("late", False),
+        })
+
+    if not students_data:
+        return skipped_results
+
+    # 2. Process via Gemini
+    batch_results = []
     for attempt in range(max_retries):
         await rate_limiter.acquire()
         try:
-            result = grade_submission(
+            batch_results = await asyncio.to_thread(
+                grade_submission_batch,
                 client=gemini_client,
                 assignment_title=config["assignment_title"],
                 rubric=config.get("rubric_text", ""),
                 system_prompt=config.get("system_prompt", ""),
-                student_name=profile["name"],
-                student_content=student_content,
+                students_data=students_data,
                 max_score=config["max_score"],
                 thinking_level=config.get("thinking_level", "medium"),
-                cached_content_name=config.get("cached_content_name", ""),
             )
-            if result:
-                cost_tracker.record(result)
-                rate_limiter.on_success()
 
-                if submission.get("late", False):
-                    original_score = result["score"]
-                    result["score"] = max(0, original_score - 10)
-                    result["feedback"] += "\n\n[System Note: A 10-point penalty was applied for a late submission.]"
+            if batch_results:
+                # Extract usage from the first item if present
+                usage = batch_results[0].pop("usage_metrics", None)
+                if usage:
+                    cost_tracker.record(usage)
+                rate_limiter.on_success()
                 break
+
         except Exception as e:
-            logger.warning("🔄 Retry %d/%d for %s: %s", attempt+1, max_retries, profile["name"], e)
+            logger.warning("🔄 Retry %d/%d for batch %d: %s", attempt + 1, max_retries, batch_idx, e)
             rate_limiter.on_rate_limit()
             await asyncio.sleep(2 ** attempt)
 
-    if not result:
-        dead_letter.add(submission_id, "Exhausted retries", max_retries)
-        return {
-            "status": "failed_after_retries",
-            "name": profile["name"],
-            "email": profile["email"],
-            "max_score": config["max_score"],
-        }
+    # 3. Handle failures & map results
+    final_results = []
+    final_results.extend(skipped_results)
 
-    if not dry_run:
-        posted = post_draft_grade(
-            service=classroom_service,
-            course_id=config["course_id"],
-            coursework_id=config["coursework_id"],
-            submission_id=submission_id,
-            score=result["score"],
-            max_score=config["max_score"],
-        )
-        # Even if posting to Classroom failed (403/permission), keep the AI result
-        # so it can be written to the CSV and reviewed manually.
-        result["status"] = "graded" if posted else "graded_locally_only"
-    else:
-        result["status"] = "success" if config.get("csv_only") else "dry_run"
+    if not batch_results:
+        for student in students_data:
+            dead_letter.add(student["submission_id"], "Exhausted retries for batch", max_retries)
+            final_results.append({
+                "status": "failed_after_retries",
+                "name": student["profile"]["name"],
+                "email": student["profile"]["email"],
+                "max_score": config["max_score"],
+            })
+        return final_results
 
-    result["name"] = profile["name"]
-    result["email"] = profile["email"]
-    result["max_score"] = config["max_score"]
-    return result
+    # Link results back to student IDs and post grades
+    for student in students_data:
+        profile = student["profile"]
+        submission_id = student["submission_id"]
+
+        # Find this student's result from the parsed batch array
+        stu_result = next((r for r in batch_results if r.get("name") == profile["name"]), None)
+
+        if not stu_result:
+            final_results.append({
+                "status": "failed_parsing",
+                "name": profile["name"],
+                "email": profile["email"],
+                "max_score": config["max_score"],
+            })
+            continue
+
+        if student["late"]:
+            original_score = stu_result["score"]
+            stu_result["score"] = max(0, original_score - 10)
+            stu_result["feedback"] += "\n\n[System Note: A 10-point penalty was applied for a late submission.]"
+
+        if not dry_run:
+            posted = post_draft_grade(
+                service=classroom_service,
+                course_id=config["course_id"],
+                coursework_id=config["coursework_id"],
+                submission_id=submission_id,
+                score=stu_result["score"],
+                max_score=config["max_score"],
+            )
+            stu_result["status"] = "graded" if posted else "graded_locally_only"
+        else:
+            stu_result["status"] = "success" if config.get("csv_only") else "dry_run"
+
+        stu_result["email"] = profile["email"]
+        stu_result["max_score"] = config["max_score"]
+        final_results.append(stu_result)
+
+    return final_results
 
 
 async def run_local_queue(
@@ -201,31 +242,33 @@ async def run_local_queue(
     max_concurrency: int = 3,
     base_delay: float = 12.0,
     output_dir: str = ".",
+    batch_size: int = 5,
 ):
     rate_limiter = AdaptiveRateLimiter(base_delay=base_delay, max_concurrency=max_concurrency)
     cost_tracker = CostTracker()
     dead_letter = DeadLetterQueue(Path(output_dir))
-    results = []
+
+    # Chunk the submissions list into groups of batch_size
+    batches = [submissions[i:i + batch_size] for i in range(0, len(submissions), batch_size)]
     semaphore = asyncio.Semaphore(max_concurrency)
 
-    async def worker(idx, sub):
+    async def worker(idx, batch):
         async with semaphore:
-            return await process_submission(
-                idx, sub, config, classroom_service, drive_service,
+            return await process_batch(
+                idx, batch, config, classroom_service, drive_service,
                 gemini_client, rate_limiter, cost_tracker, dead_letter, dry_run
             )
 
-    tasks = [asyncio.create_task(worker(i, sub)) for i, sub in enumerate(submissions)]
-    results = await asyncio.gather(*tasks, return_exceptions=True)
+    tasks = [asyncio.create_task(worker(i, batch)) for i, batch in enumerate(batches)]
+    results_lists = await asyncio.gather(*tasks, return_exceptions=True)
 
     # Filter exceptions
     final_results = []
-    for r in results:
-        if isinstance(r, Exception):
-            logger.error("💥 Worker crashed: %s", r)
-            final_results.append({"status": "worker_crash", "name": "Unknown", "email": "Unknown"})
+    for r_list in results_lists:
+        if isinstance(r_list, Exception):
+            logger.error("💥 Worker crashed: %s", r_list)
         else:
-            final_results.append(r)
+            final_results.extend(r_list)
 
     dead_letter.flush()
     return final_results, cost_tracker.report()
