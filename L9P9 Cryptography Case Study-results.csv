@@ -1,0 +1,1272 @@
+Student Name,Score,Max Score,Percentage,Feedback,Status,AI Detection,CDRP Flags
+ALELHY ALLESSANDRA DE RUEDA,93.0,100,93.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""This collaboration gives us the absolute best of both worlds: the unbreakable key exchange of asymmetric cryptography and the lightning-fast speed of symmetric encryption.""
+   CONTEXT: ""user's session. This >> This collaboration gives us the absolute best of both worlds: the unbreakable key exchange of asymmetric cryptography and the lightning-fast speed of symmetric encryption. << Reflection 1. According""
+2. SENTENCE: ""The reason we should never write our own custom encryption algorithms is that cryptography is incredibly complex, and even the smallest hidden flaw can ruin an entire system.""
+   CONTEXT: ""libsodium)? - The >> The reason we should never write our own custom encryption algorithms is that cryptography is incredibly complex, and even the smallest hidden flaw can ruin an entire system. << Standardized libraries like""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 93 / 100
+- Reflected Score: 93 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Mostly Human
+- CDRP Flags: 2
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 20/25 — Good — Submission includes the Background, Scenario, and Instructions headers which were explicitly required to be removed.
+- AI Originality & Effort: 23/25 — Good — Demonstrates strong synthesis of cryptographic concepts, though some reflection responses follow standard rhetorical patterns.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Portfolio #9: correctly identifies SubBytes as Confusion and MixColumns as Diffusion in the AES-256 section.
+- Case Study Application & Justification: 25/25 — Excellent — Provides a clear, step-by-step logical flow for the hybrid handshake involving ECC and AES-256.
+- TOTAL: 93/100 — Math verified: 20+23+25+25 = 93
+===STUDENT FEEDBACK===
+You have demonstrated an excellent technical grasp of cryptographic principles, particularly in your detailed explanation of the AES-256 internal operations like SubBytes and MixColumns. Your justification for transitioning AFN to ECC is highly compelling, correctly identifying the computational efficiency of curve-based mathematics over large prime factorization for mobile environments. The step-by-step breakdown of the hybrid handshake shows a clear understanding of how asymmetric and symmetric protocols collaborate in a modern TLS 1.3-like environment.
+
+To improve future submissions, ensure you strictly follow formatting constraints, such as the instruction to remove all headers and background text from the final document before uploading. While your reflection on the ""Golden Rule"" of cryptography is accurate, you could strengthen your analysis by connecting the risks of custom algorithms specifically to the AFN development team's lack of legacy support. Consider also exploring how specific salt lengths impact the search space for attackers to further ground your defense strategy in mathematical detail.
+
+This is a very strong submission that shows you are well-prepared to handle architectural security decisions. Keep up the rigorous approach to technical justifications.
+
+Your reflection and analysis contain language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+
+""This collaboration gives us the absolute best of both worlds: the unbreakable key exchange of asymmetric cryptography and the lightning-fast speed of symmetric encryption.""
+(Category E — the ""best of both worlds"" construction provides a broad summary of hybrid cryptography that remains valid regardless of the specific banking scenario or the specific protocols mentioned.)
+
+""The reason we should never write our own custom encryption algorithms is that cryptography is incredibly complex, and even the smallest hidden flaw can ruin an entire system.""
+(Category A — the sentence functions as a universal moral maxim about system design; removing the context of the question leaves a general statement on complexity and risk that is portable to any engineering discipline.)
+
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly Human,2
+ALEXANDER JOVE MIKAEL SIMPELO,95.0,100,95.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""Using standardized cryptographic libraries greatly reduces this risk.""
+   CONTEXT: ""and financial transactions. >> Using standardized cryptographic libraries greatly reduces this risk. << 2. How does""
+2. SENTENCE: ""If the hashes do not match, the system will know that tampering occurred.""
+   CONTEXT: ""document was modified. >> If the hashes do not match, the system will know that tampering occurred. << Because of the""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 95 / 100
+- Reflected Score: 95 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Mostly Human
+- CDRP Flags: 2
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 20/25 — Good — Student failed to remove headers, scenario text, and instructions as required by the ""Note"" section.
+- AI Originality & Effort: 25/25 — Excellent — Submission includes consistent references to ""the lesson"" and applies concepts directly to the AFN scenario.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Correctly identifies SubBytes as confusion and MixColumns as diffusion in AES-256.
+- Case Study Application & Justification: 25/25 — Excellent — Part 3: Hybrid Solution provides a clear 4-step handshake using ECDHE and AES-GCM.
+- TOTAL: 95/100 — Math verified: 20+25+25+25 = 95
+===STUDENT FEEDBACK===
+You demonstrated a high level of technical proficiency by correctly identifying the cryptographic operations of AES-256, specifically citing SubBytes for confusion and MixColumns for diffusion. Your justification for ECC over RSA was well-argued, correctly noting that P-256 offers equivalent security to RSA-3072 with significantly lower computational overhead for mobile devices. The hybrid handshake you designed in Part 3 effectively bridges the gap between secure key exchange and high-speed data encryption.
+
+To improve your future submissions, ensure you strictly follow the formatting constraints, specifically the instruction to remove all prompt headers and scenario text before uploading. While your technical content is excellent, your file currently includes several pages of the original activity instructions which should have been excised. You might also consider explicitly naming the specific mathematical problem that makes RSA difficult to break to match the depth you provided for ECC's ECDLP.
+
+Your understanding of the Avalanche Effect and its role in transaction integrity is very clear and well-explained. Keep up the rigorous approach to algorithm evaluation.
+
+Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include:
+  ""Using standardized cryptographic libraries greatly reduces this risk.""
+  (Category E — the sentence offers a broad professional verdict on risk reduction that functions independently of the AFN case study details.)
+  ""If the hashes do not match, the system will know that tampering occurred.""
+  (Category C — the phrasing describes the generic mechanism of a hash check without any anchoring to the financial transaction document or the SHA-256 algorithm.)
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly Human,2
+EUGENE RIZEL VICEDO,60.0,100,60.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""No serious cracking effort required.""
+   CONTEXT: ""MD5 hashes. >> No serious cracking effort required. << Part 1: Hashing""
+2. SENTENCE: ""Even if someone intercepts the handshake, they can't get the key.""
+   CONTEXT: ""the network. >> Even if someone intercepts the handshake, they can't get the key. << After that, everything""
+3. SENTENCE: ""Writing something custom means starting that process from scratch and almost certainly shipping something with weaknesses you won't find until it's too late.""
+   CONTEXT: ""for decades. >> Writing something custom means starting that process from scratch and almost certainly shipping something with weaknesses you won't find until it's too late. << 2. How does""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 80 / 100
+- Reflected Score: 60 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: FAIL
+- AI Label: Mostly AI
+- CDRP Flags: 3
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 15/25 — Needs Improvement — Submission: includes full ""Background / Scenario"" and ""Instructions"" text — violates ""Remove all headers"" rule.
+- AI Originality & Effort: 15/25 — Needs Improvement — Reflection: ""Writing something custom..."" — contains 3 CDRP flags without Transparency Report.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: AES-256 + ""14 rounds"" and ""SubBytes"" / ""MixColumns"" correctly identified — No Reference — domain knowledge applied.
+- Case Study Application & Justification: 25/25 — Excellent — Part 2: ECC + ""256-bit ECC key is roughly equivalent to a 3072-bit RSA key"" — strong context application — No Reference — domain knowledge applied.
+- TOTAL: 80/100 — Math verified: 15+15+25+25 = 80
+===STUDENT FEEDBACK===
+You demonstrated a high level of technical accuracy in your evaluation of cryptographic algorithms, particularly in Part 2 where you correctly identified the specific number of rounds for AES-256 and the roles of SubBytes and MixColumns. Your justification for transitioning to ECC was well-supported by citing the specific efficiency gains of a 256-bit ECC key compared to its RSA equivalent, which directly addressed the mobile performance issues mentioned in the case study. The explanation of the hybrid handshake in Part 3 correctly identified the transition from ECDHE for key exchange to AES for bulk data encryption.
+
+However, your submission failed to follow several formatting instructions, most notably the requirement to remove all headers and instructions before uploading, as your document still contains the full background and instruction text. You also used arrow bullets instead of the requested lettered sub-items for your responses. Additionally, several sections of your analysis used generic phrasing that triggered structural flags, and since no Transparency Report was provided to explain your use of AI tools, a score penalty was applied. To improve, ensure you strictly follow document preparation rules and provide more specific, anchored reasoning in your reflections to avoid generic rhetorical patterns.
+
+Please review the specific formatting requirements for future portfolios to ensure your technical work is not overshadowed by avoidable structural errors.
+
+Your reflection contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+""[No serious cracking effort required.]""
+(Category A — the phrase acts as a rhetorical amplifier to close the paragraph, providing a broad verdict on the difficulty of an attack that does not depend on the specific MD5 mechanism mentioned earlier)
+""[Even if someone intercepts the handshake, they can't get the key.]""
+(Category E — this sentence provides a universal summary of secure key exchange that would remain a valid conclusion for any protocol involving session keys, regardless of the specific ECC or AES collaboration discussed)
+""[Writing something custom means starting that process from scratch and almost certainly shipping something with weaknesses you won't find until it's too late.]""
+(Category E — the sentence delivers a broad ethical and practical verdict on the dangers of custom development that would survive transplantation to any submission about software standards without modification)
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly AI,3
+TANYA DENISE YAMBAO,98.0,100,98.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""Confusion makes the relationship between the key and ciphertext difficult to predict, while diffusion spreads changes across the encrypted data so patterns are hidden.""
+   CONTEXT: ""and MixColumns >> Confusion makes the relationship between the key and ciphertext difficult to predict, while diffusion spreads changes across the encrypted data so patterns are hidden. << AES is currently""
+2. SENTENCE: ""Using trusted cryptographic libraries is safer and more reliable than building custom solutions.""
+   CONTEXT: ""exploit easily. >> Using trusted cryptographic libraries is safer and more reliable than building custom solutions. << 2. Avalanche Effect""
+3. SENTENCE: ""If AFN developers try making their own encryption system, they could accidentally introduce vulnerabilities attackers can exploit easily.""
+   CONTEXT: ""custom solutions. >> If AFN developers try making their own encryption system, they could accidentally introduce vulnerabilities attackers can exploit easily. << Using trusted cryptographic""
+4. SENTENCE: ""This ensures financial records and transactions remain accurate and unaltered.""
+   CONTEXT: ""immediately detectable. >> This ensures financial records and transactions remain accurate and unaltered. << [end of doc]""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 98 / 100
+- Reflected Score: 98 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Human Written
+- CDRP Flags: 0
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 23/25 — Good — Submission: bullets used instead of lettered sub-items required for Excellent.
+- AI Originality & Effort: 25/25 — Excellent — Reflection: Section 1 & 2 show clear synthesis of cryptographic principles in student's own words.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 1: Defense Strategy — correctly identifies SHA-256, Salt, and Pepper mechanisms.
+- Case Study Application & Justification: 25/25 — Excellent — Part 3: Hybrid Solution — accurately maps the ECC/DH and AES-256 collaboration steps.
+- TOTAL: 98/100 — Math verified: 23+25+25+25 = 98
+
+===STUDENT FEEDBACK===
+Your analysis of the Aegis Financial Network case is exceptional and demonstrates a high level of technical clarity. You correctly identified the specific risks of MD5 and provided a mathematically sound defense strategy using SHA-256 with both salt and pepper. The justification for transitioning to Elliptic Curve Cryptography in Part 2 was particularly strong, as you successfully linked the mathematical efficiency of ECC to the practical battery and performance constraints of mobile banking applications.
+
+While your content is excellent, there is a minor formatting deviation regarding the structure of your sub-items. To reach the highest tier in formatting, ensure you use lettered sub-items like a, b, and c as specified in the rubric descriptors rather than standard bullet points. Additionally, you might consider expanding on the specific mathematical advantage of the P-256 curve to further strengthen your justification for the CISO.
+
+This is a very professional submission that shows you have a firm grasp of how different cryptographic primitives work together to create a secure system. Your explanation of the Avalanche Effect in the reflection section was particularly well-articulated and showed a clear understanding of data integrity. Keep up the excellent work in applying these theoretical concepts to real-world security scenarios.",success,Human Written,0
+REAVEN MIANO,93.0,100,93.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""One simple mistake during programming, including making an error when generating the first random number, could render a perfectly-designed algorithm useless.""
+   CONTEXT: ""cryptography experts. >> One simple mistake during programming, including making an error when generating the first random number, could render a perfectly-designed algorithm useless. << Although developers of""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+--- FORMAT A (flags = 0, or valid TR, or flags 0–4 without TR — no score penalty):
+- Rubric Score: 93 / 100
+- Reflected Score: 93 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Mostly Human
+- CDRP Flags: 1
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 23/25 — Good — Submission: Part 1, 2, 3, and Reflection present; uses bullets instead of lettered sub-items.
+- AI Originality & Effort: 20/25 — Good — Submission: Reflection section contains one instance of contextually detached rhetorical polish.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Submission: Part 1: MD5 (128 bits); Part 2: SubBytes (Confusion) and MixColumns (Diffusion) correctly defined.
+- Case Study Application & Justification: 25/25 — Excellent — Submission: Part 3: Step-by-step hybrid handshake correctly identifies ECDH and AES-256 collaboration.
+- TOTAL: 93/100 — Math verified: 23+20+25+25 = 93
+===STUDENT FEEDBACK===
+Your submission demonstrates a high level of technical accuracy, particularly in your evaluation of symmetric and asymmetric algorithms. You correctly identified the 128-bit nature of MD5 and provided a clear, mathematically grounded explanation of how SubBytes and MixColumns achieve confusion and diffusion in AES-256. The hybrid handshake flow in Part 3 is exceptionally well-detailed, correctly identifying the role of ECDH in establishing session keys.
+
+To further improve, ensure that you follow the structural requirements of the instructions more precisely by using lettered sub-items as requested rather than bullet points. While your technical analysis is strong, the reflection section would benefit from more specific examples tied directly to the AFN banking scenario to avoid overly generic conclusions.
+
+Overall, this is a very strong portfolio that shows a clear understanding of modern cryptographic standards and their practical application in mobile environments.
+
+Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+""One simple mistake during programming, including making an error when generating the first random number, could render a perfectly-designed algorithm useless.""
+(Category A — the sentence uses a ""one mistake... could render... useless"" structure to deliver a universal maxim on security that remains valid regardless of the specific AFN scenario or algorithm being discussed)",success,Mostly Human,1
+JOSHUA MARL SARA,88.0,100,88.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""Even a tiny mistake in the design can create hidden vulnerabilities that attackers can exploit.""
+   CONTEXT: ""is extremely complex. >> Even a tiny mistake in the design can create hidden vulnerabilities that attackers can exploit. << Standardized libraries like""
+2. SENTENCE: ""Standardized libraries like OpenSSL and libsodium are heavily tested, peer-reviewed, and trusted by security experts worldwide.""
+   CONTEXT: ""can exploit. Standardized >> Standardized libraries like OpenSSL and libsodium are heavily tested, peer-reviewed, and trusted by security experts worldwide. << Using proven libraries""
+3. SENTENCE: ""The Avalanche Effect means that even a very small change in the input will produce a completely different hash output.""
+   CONTEXT: ""Answers 2. The >> The Avalanche Effect means that even a very small change in the input will produce a completely different hash output. << In SHA-256, changing""
+4. SENTENCE: ""This guarantees integrity because if someone secretly modifies the transaction data, the hash will no longer match, immediately showing that the document was tampered with.""
+   CONTEXT: ""different hash value. >> This guarantees integrity because if someone secretly modifies the transaction data, the hash will no longer match, immediately showing that the document was tampered with. << [End of document]""
+5. SENTENCE: ""AES-256 is much stronger because it uses a 256-bit key and performs 14 rounds of encryption, making attacks practically impossible with current technology.""
+   CONTEXT: ""modern computers. AES-256 >> AES-256 is much stronger because it uses a 256-bit key and performs 14 rounds of encryption, making attacks practically impossible with current technology. << AES is also""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 88 / 100
+- Reflected Score: 88 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Mostly Human
+- CDRP Flags: 1
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 18/25 — Good — Submission: Includes school headers, objectives, and scenario text contrary to instructions.
+- AI Originality & Effort: 20/25 — Good — Reflection: Phrasing ""Even a tiny mistake..."" matches portable rhetorical patterns.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Answers: Correct technical details for SHA-256 (Salt/Pepper) and AES-256 (14 rounds).
+- Case Study Application & Justification: 25/25 — Excellent — Hybrid Solution: Complete 6-step handshake correctly integrating ECDH and AES-256 provided.
+- TOTAL: 88/100 — Math verified: 18+20+25+25 = 88
+
+===STUDENT FEEDBACK===
+You demonstrated a high level of technical accuracy in your evaluation of AES-256, specifically correctly identifying the 14 rounds and the roles of SubBytes and MixColumns in providing confusion and diffusion. Your hybrid solution in Part 3 provides a clear, step-by-step breakdown of the ECDH and AES collaboration which perfectly addresses the AFN mobile performance dilemma. Additionally, your comparison of RSA and ECC key sizes accurately reflects modern security standards for mobile banking applications.
+
+While your content is technically strong, you did not follow the instruction to remove school headers, objectives, and scenario text from the final document. To improve your formatting score, you must ensure that all administrative headers and prompt text are removed from the final PDF as specified in the instructions. Additionally, your responses would benefit from using lettered sub-items rather than bullet points to strictly adhere to the requested structure. Regarding your reflection, you can enhance the originality of your work by incorporating specific examples of how a custom algorithm failure might uniquely impact a digital banking platform like AFN.
+
+Your technical grasp of cryptographic handshakes is impressive, and applying this to the mobile-first scenario shows a good understanding of real-world constraints.
+
+Your reflection and analysis contain language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include:
+""Even a tiny mistake in the design can create hidden vulnerabilities that attackers can exploit.""
+(Category A — the ""Even a [noun] can [verb]"" construction functions as a universal security maxim that remains valid regardless of whether the subject is cryptography, bridge building, or web development.)",success,Mostly Human,1
+CHRISTINE ANNE ALCANTARA,93.0,100,93.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""Because of these features, AES delivers better performance, stronger security, and has become the trusted encryption standard used in financial institutions, governments, and modern secure systems.""
+   CONTEXT: ""each encryption round. >> Because of these features, AES delivers better performance, stronger security, and has become the trusted encryption standard used in financial institutions, governments, and modern secure systems. << Asymmetric Encryption (Key""
+2. SENTENCE: ""By using proven libraries, AFN can minimize the chances of weak encryption, poor random number generation, and coding errors that could expose confidential informations.""
+   CONTEXT: ""by security professionals. >> By using proven libraries, AFN can minimize the chances of weak encryption, poor random number generation, and coding errors that could expose confidential informations. << 2. How does""
+3. SENTENCE: ""Combining asymmetric and symmetric cryptography allows AFN to maintain strong protection for sensitive financial data while also ensuring fast and reliable mobile banking performance.""
+   CONTEXT: ""high speed. Combining >> Combining asymmetric and symmetric cryptography allows AFN to maintain strong protection for sensitive financial data while also ensuring fast and reliable mobile banking performance. << Reflection 1. According""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 93 / 100
+- Reflected Score: 93 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Human Written
+- CDRP Flags: 0
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 18/25 — Good — Alcantara_Submission: ""Background / Scenario"" and ""Instructions"" headers were retained despite instructions to remove them; bullet points used instead of required lettered sub-items.
+- AI Originality & Effort: 25/25 — Excellent — Alcantara_Submission: presence of specific ESL markers such as ""confidential informations"" and redundant phrasing in Part 1 indicates original student authorship.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Alcantara_Submission: correctly identifies MD5 as 128-bit and accurately describes the roles of SubBytes (Confusion) and MixColumns (Diffusion). No Reference — domain knowledge applied.
+- Case Study Application & Justification: 25/25 — Excellent — Alcantara_Submission: provides precise mathematical justification for ECC, citing that a 256-bit ECC key is comparable to a 3072-bit RSA key. No Reference — domain knowledge applied.
+- TOTAL: 93/100 — Math verified: 18+25+25+25 = 93
+===STUDENT FEEDBACK===
+You demonstrated a high level of technical accuracy, particularly in your explanation of the Advanced Encryption Standard operations in Alcantara_Submission. Your comparison between Elliptic Curve Cryptography and RSA provided specific, quantifiable evidence regarding key sizes that effectively justified the transition for mobile platforms. The description of the hybrid handshake correctly identified the role of ECDHE in establishing session keys for AES-GCM encryption.
+
+To improve the professional presentation of your work in Alcantara_Submission, ensure that you follow the negative constraints of the assignment by removing all provided background text and instruction headers before final submission. Additionally, strictly adhere to the requested structural format by using lettered sub-items instead of bullet points to organize your responses.
+
+Your understanding of the mathematical trade-offs in modern cryptography is excellent and shows a strong grasp of the subject matter.",success,Human Written,0
+MARC MANUEL MARQUEZ,100.0,100,100.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""Combining SHA 256 with salt and pepper mathematically ensures Rainbow Table Attacks are rendered completely ineffective.""
+   CONTEXT: ""is stolen. >> Combining SHA 256 with salt and pepper mathematically ensures Rainbow Table Attacks are rendered completely ineffective. << Part 2: Algorithm""
+2. SENTENCE: ""In this way, ECC provides secure key exchange while AES delivers fast encryption, combining both strengths to guarantee secure and fast communication.""
+   CONTEXT: ""large transactions. >> In this way, ECC provides secure key exchange while AES delivers fast encryption, combining both strengths to guarantee secure and fast communication. << Reflection 1. It""
+3. SENTENCE: ""Therefore using trusted frameworks such as OpenSSL or Libosodium ensures tested, secured and continuous updates to protect against modern attacks.""
+   CONTEXT: ""and exploitation. >> Therefore using trusted frameworks such as OpenSSL or Libosodium ensures tested, secured and continuous updates to protect against modern attacks. << 2. The Avalanche""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 100 / 100
+- Reflected Score: 100 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Human Written
+- CDRP Flags: 0
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 25/25 — Excellent — Part 1-3: all sections present and labeled correctly.
+- AI Originality & Effort: 25/25 — Excellent — Reflection 1: original synthesis of why peer-reviewed libraries are necessary.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: correctly identifies SubBytes (Confusion) and MixColumns (Diffusion).
+- Case Study Application & Justification: 25/25 — Excellent — Part 2.2: provides compelling performance-based defense for ECC on mobile devices.
+- TOTAL: 100/100 — Math verified: 25+25+25+25 = 100
+
+===STUDENT FEEDBACK===
+You have demonstrated a high level of technical proficiency in this case study, particularly in your explanation of the Advanced Encryption Standard. Your analysis of how SubBytes and MixColumns contribute to confusion and diffusion shows a clear understanding of block cipher operations. The transition you proposed from RSA to ECC is well-supported by specific performance metrics such as CPU strain and battery life which are critical for the AFN mobile application scenario.
+
+Your explanation of the hybrid cryptographic handshake in Part 3 correctly identifies the sequence of operations required for a secure session. You accurately described the collaboration between Diffie-Hellman for the initial key exchange and AES for the subsequent bulk data encryption. The reflection on the Avalanche Effect effectively connects a mathematical property to the real-world requirement of document integrity in financial transactions.
+
+This is an excellent submission that meets all technical and formatting requirements. Your ability to apply cryptographic theory to a specific business problem like the AFN breach is exactly what is expected at this level. Continuing to focus on the specific implementation details of modern protocols like TLS 1.3 will serve you well in future security architecture tasks.",success,Human Written,0
+STEVE MARION CHAN,72.0,100,72.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""Together, these features make it effectively impossible for attackers to break through brute-force attempts or cryptanalytic techniques.""
+   CONTEXT: ""achieve diffusion. >> Together, these features make it effectively impossible for attackers to break through brute-force attempts or cryptanalytic techniques. << ECC, such as""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 72 / 100
+- Reflected Score: 72 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: FAIL
+- AI Label: Mostly Human
+- CDRP Flags: 1
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 12/25 — Needs Improvement — Portfolio #9: Cryptography Case Study: student failed to remove headers, instructions, and rubric as directed in the Note section.
+- AI Originality & Effort: 15/25 — Needs Improvement — Reflection: content relies on standard textbook definitions of the Avalanche Effect and Golden Rule without personal synthesis or deep analysis.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: Symmetric Encryption: correctly identifies SubBytes for confusion and MixColumns for diffusion.
+- Case Study Application & Justification: 20/25 — Good — Part 3: Hybrid Solution: correctly identifies the roles of ECC and AES but provides a summary paragraph instead of a step-by-step handshake flow.
+- TOTAL: 72/100 — Math verified: 12+15+25+20 = 72
+===STUDENT FEEDBACK===
+You demonstrated a strong technical grasp of cryptographic operations, particularly in your accurate identification of how SubBytes and MixColumns contribute to confusion and diffusion within the AES algorithm. Your analysis of the advantages of Elliptic Curve Cryptography for mobile environments correctly highlighted the critical relationship between key size, battery consumption, and connection speed for AFN's users.
+
+However, your submission failed to follow the explicit formatting instructions to remove all headers, background text, and the rubric before uploading, which resulted in a significant point deduction. To improve, ensure you provide the hybrid handshake as a clear, step-by-step sequence of events rather than a single summary paragraph, and focus on applying the cryptographic concepts specifically to the AFN scenario rather than providing general definitions.
+
+While your technical accuracy is high, please pay closer attention to the administrative requirements of the activity to ensure your final score reflects your subject matter expertise.
+
+Your analysis and reflection contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+""Together, these features make it effectively impossible for attackers to break through brute-force attempts or cryptanalytic techniques.""
+(Category A — the sentence uses a summary transition to provide a rhetorical flourish regarding security outcomes that does not depend on the specific technical details of AES-256 to remain valid)
+
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly Human,1
+MARY DENISE HARDER,60.0,100,60.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""This architectural enhancement mathematically invalidates any attempt to use standard Rainbow Tables.""
+   CONTEXT: ""processing blender. >> This architectural enhancement mathematically invalidates any attempt to use standard Rainbow Tables. << Even if two""
+2. SENTENCE: ""This massive disparity is rooted in the underlying mathematical problems each algorithm leverages.""
+   CONTEXT: ""key length. >> This massive disparity is rooted in the underlying mathematical problems each algorithm leverages. << RSA's security relies""
+3. SENTENCE: ""By algebraic law, both independent equations resolve to the same shared cryptographic value.""
+   CONTEXT: ""Session Key . >> By algebraic law, both independent equations resolve to the same shared cryptographic value. << 4. Finished (AES""
+4. SENTENCE: ""Attempting to write a custom encryption routine introduces massive operational dangers because security vulnerabilities rarely stem from flaws in the underlying high-level mathematics; instead, they appear due to software implementation bugs.""
+   CONTEXT: ""or libsodium. >> Attempting to write a custom encryption routine introduces massive operational dangers because security vulnerabilities rarely stem from flaws in the underlying high-level mathematics; instead, they appear due to software implementation bugs. << Standardized libraries have""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 90 / 100
+- Reflected Score: 60 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: FAIL
+- AI Label: Mostly AI
+- CDRP Flags: 4
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 25/25 — Excellent — Part 1-3 and Reflection present; lettered/bulleted sub-items used correctly.
+- AI Originality & Effort: 15/25 — Needs Improvement — Submission uses highly formal, detached phrasing consistent with CDRP patterns; no Transparency Report provided.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: Symmetric Encryption: correctly identifies SubBytes (Confusion) and MixColumns (Diffusion).
+- Case Study Application & Justification: 25/25 — Excellent — Part 3: Hybrid Solution: provides detailed 4-phase handshake with correct ECDHE mathematical notation.
+- TOTAL: 90/100 — Math verified: 25+15+25+25 = 90
+===STUDENT FEEDBACK===
+You have demonstrated an exceptional technical grasp of cryptographic operations, particularly in your detailed breakdown of the AES state matrix transformations and the mathematical logic of the Diffie-Hellman handshake. Your explanation of the Avalanche Effect in the reflection section clearly connects theoretical properties to the practical integrity of financial documents. The inclusion of specific mathematical parameters for the key exchange process shows a high level of academic rigor.
+
+However, the phrasing used throughout the analysis is frequently detached from the specific AFN scenario, relying on highly formal templates that do not always integrate your own unique voice. To improve, try to weave the specific constraints of the AFN mobile app—such as the battery drain and legacy database issues—more consistently into your evaluative sentences rather than relying on broad technical maxims. Ensure that future submissions include a Transparency Report if you utilize AI tools to assist with your drafting or research.
+
+Your technical accuracy is a significant strength that will serve you well in security architecture. Focus on developing a more personal analytical style to ensure your original thinking is as prominent as your technical knowledge.
+
+Your analysis contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+  ""This architectural enhancement mathematically invalidates any attempt to use standard Rainbow Tables.""
+  (Category A — the sentence uses the ""mathematically invalidates"" construction as a universal flourish to close the section; it functions as a moral/technical maxim that does not reference the specific salt or pepper mechanism described.)
+  ""This massive disparity is rooted in the underlying mathematical problems each algorithm leverages.""
+  (Category B — the contrast between RSA and ECC is framed through a symmetrical structure that contains no specific mention of factorization or discrete logs within the sentence itself, making it portable to any algorithm comparison.)
+  ""By algebraic law, both independent equations resolve to the same shared cryptographic value.""
+  (Category D — this transition phrase announces a conclusion about the handshake without containing the actual variables or results of the math, making it a portable filler sentence.)
+  ""Attempting to write a custom encryption routine introduces massive operational dangers because security vulnerabilities rarely stem from flaws in the underlying high-level mathematics; instead, they appear due to software implementation bugs.""
+  (Category E — this paragraph delivers a broad ethical verdict on custom cryptography that is a standard rhetorical pattern and contains no specific reference to AFN's developers or environment.)
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly AI,4
+GENEVIEVE GAMAY,95.0,100,95.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""Because a standard modern GPU can compute billions of MD5 hashes per second, it is highly susceptible to rapid brute-force attacks.""
+   CONTEXT: ""password hashing. Because >> Because a standard modern GPU can compute billions of MD5 hashes per second, it is highly susceptible to rapid brute-force attacks. << Lack of Cryptographic""
+2. SENTENCE: ""Mathematically, this introduces confusion, ensuring that the relationship between the encryption key and the resulting ciphertext remains completely obscured, thwarting algebraic cryptanalysis.""
+   CONTEXT: ""static lookup table >> Mathematically, this introduces confusion, ensuring that the relationship between the encryption key and the resulting ciphertext remains completely obscured, thwarting algebraic cryptanalysis. << MixColumns (Diffusion): This""
+3. SENTENCE: ""Standard algorithms like AES have undergone decades of hostile cryptanalysis by global math communities to ensure immunity against side-channel monitoring, timing exploits, and linear attacks.""
+   CONTEXT: ""implementation errors . >> Standard algorithms like AES have undergone decades of hostile cryptanalysis by global math communities to ensure immunity against side-channel monitoring, timing exploits, and linear attacks. << A proprietary algorithm""
+4. SENTENCE: ""It dictates that if a user changes even a single microscopic property of the input data (such as altering a single period, decimal point, or bit within a financial document), the resulting output hash changes completely and unpredictably.""
+   CONTEXT: ""SHA - 256. >> It dictates that if a user changes even a single microscopic property of the input data (such as altering a single period, decimal point, or bit within a financial document), the resulting output hash changes completely and unpredictably. << Plaintext: ""Transfer Php""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 95 / 100
+- Reflected Score: 95 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Human Written
+- CDRP Flags: 0
+- Transparency Report: Present and reflective
+CRITERIA:
+- Following Instructions & Formatting: 20/25 — Good — Submission: includes 'Objectives', 'Background / Scenario', and 'Instructions' sections — contrary to 'Note: Remove all headers...'
+- AI Originality & Effort: 25/25 — Excellent — Transparency Report: Detailed disclosure of Claude Sonnet 4.6 usage with specific prompt-to-output mapping.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: SubBytes/MixColumns explained as Confusion/Diffusion — matches technical requirements.
+- Case Study Application & Justification: 25/25 — Excellent — Part 3: 4-step hybrid handshake (Ephemeral Exchange to Bulk Encryption) — correctly applied to AFN scenario.
+- TOTAL: 95/100 — Math verified: 20+25+25+25 = 95
+===STUDENT FEEDBACK===
+Your submission demonstrates a high level of technical proficiency, particularly in your explanation of the Advanced Encryption Standard (AES) internal operations. You correctly identified how SubBytes and MixColumns provide the necessary confusion and diffusion to secure the AFN database. Furthermore, your use of a comparison table for RSA and ECC key sizes effectively illustrates the performance benefits of transitioning to elliptic curve cryptography for mobile environments.
+
+The primary area for improvement concerns your adherence to the administrative formatting constraints. While the content itself is excellent, you included the activity's objectives, background scenario, and instructions within your final PDF, which the prompt specifically requested you to remove. In future portfolios, ensure your document contains only your original analysis and the required Transparency Report to maintain a professional, clean submission format.
+
+Your ability to synthesize complex cryptographic handshakes into a logical four-step process is impressive. Thank you for including your Transparency Report and for being upfront about your use of AI tools in this submission.",success,Human Written,0
+ERVING IAN MACAPAGAL,60.0,100,60.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""The architecture will fail only if all three defenses are compromised at the same time and each one can fail independently of the others.""
+   CONTEXT: ""reversed or collided. >> The architecture will fail only if all three defenses are compromised at the same time and each one can fail independently of the others. << Part 2: Algorithm""
+2. SENTENCE: ""The refined outcome is that ECC performs precisely one costly task, after which it transfers to AES for the multitude of rapid, inexpensive operations that ensue.""
+   CONTEXT: ""sessions remains indecipherable. >> The refined outcome is that ECC performs precisely one costly task, after which it transfers to AES for the multitude of rapid, inexpensive operations that ensue. << Reflection 1. According""
+3. SENTENCE: ""To breach this guarantee, one would need to identify two distinct documents yielding the same 256-bit hash, necessitating a collision search among 2^258 possibilities that no existing computer could achieve before the universe experiences heat death.""
+   CONTEXT: ""intentionally and unpredictably. >> To breach this guarantee, one would need to identify two distinct documents yielding the same 256-bit hash, necessitating a collision search among 2^258 possibilities that no existing computer could achieve before the universe experiences heat death. << [End of submission]""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 80 / 100
+- Reflected Score: 60 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: FAIL
+- AI Label: Mostly AI
+- CDRP Flags: 3
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 15/25 — Needs Improvement — Submission: ""Instructions"" and ""Background / Scenario"" headers retained; Reflection: Q1 text is a duplicate of ""The Dilemma"" section.
+- AI Originality & Effort: 15/25 — Needs Improvement — Submission: 3 CDRP flags identified; Reflection: Q1 fails to discuss peer-reviewed libraries or OpenSSL as requested.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: ""SubBytes manages confusion... MixColumns achieves diffusion"" — correct technical application.
+- Case Study Application & Justification: 25/25 — Excellent — Part 2: ""ECC's mathematics is more efficient... allowing the processor to... return to a low-power mode"" — direct application to AFN battery issues.
+- TOTAL: 80/100 — Math verified: 15+15+25+25 = 80
+
+===STUDENT FEEDBACK===
+You demonstrated a strong technical grasp of cryptographic operations, particularly in your detailed explanation of the AES transformation rounds and the mathematical advantages of ECC over RSA. Your analysis of the AFN mobile application's battery depletion issues was well-justified by connecting CPU cycle requirements to specific asymmetric algorithms. You correctly identified the vulnerabilities of MD5 and proposed a mathematically sound defense using SHA-256 with unique salts and system-wide peppers.
+
+However, there are significant issues with the formatting and the originality of your reflection section. You must ensure that all activity headers and rubrics are removed from the final document as specified in the instructions. Furthermore, your response to Reflection Question 1 is a verbatim copy of your answer for ""The Dilemma"" in Part 3, which means you failed to address the specific question regarding the dangers of custom encryption and the importance of peer-reviewed libraries like OpenSSL. To improve, please ensure that every section of your portfolio contains unique analysis and adheres strictly to the submission formatting rules.
+
+Your technical accuracy is excellent, but academic success requires consistent effort across all parts of the assignment, including the reflective components. Please review the university guidelines on formatting and academic integrity for future submissions.
+
+Your analysis contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+""The architecture will fail only if all three defenses are compromised at the same time and each one can fail independently of the others.""
+(Category E — The ""will fail only if all three defenses are compromised"" phrasing is a generic description of defense-in-depth that remains portable across any multi-layered security discussion.)
+""The refined outcome is that ECC performs precisely one costly task, after which it transfers to AES for the multitude of rapid, inexpensive operations that ensue.""
+(Category E — The ""precisely one costly task... for the multitude of rapid... that ensue"" construction provides a polished rhetorical summary of hybrid systems that does not require the specific context of ECC or AES to be valid.)
+""To breach this guarantee, one would need to identify two distinct documents yielding the same 256-bit hash, necessitating a collision search among 2^258 possibilities that no existing computer could achieve before the universe experiences heat death.""
+(Category A — The ""heat death of the universe"" closing is a contextually detached rhetorical flourish used to signify computational impossibility without adding specific technical analysis of the SHA-256 algorithm.)
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly AI,3
+MIKYLA REIGN VIDAMO,60.0,100,60.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""The main challenge in secure communication is that symmetric and asymmetric cryptography each solve different problems.""
+   CONTEXT: ""key exchange. >> The main challenge in secure communication is that symmetric and asymmetric cryptography each solve different problems. << Symmetric encryption like""
+2. SENTENCE: ""This is dangerous because cryptography is highly complex, and even a small mistake can make the entire system insecure.""
+   CONTEXT: ""encryption algorithms. >> This is dangerous because cryptography is highly complex, and even a small mistake can make the entire system insecure. << A custom algorithm""
+3. SENTENCE: ""A custom algorithm may seem secure at first, but hidden weaknesses may allow attackers to break it easily.""
+   CONTEXT: ""system insecure. >> A custom algorithm may seem secure at first, but hidden weaknesses may allow attackers to break it easily. << In a financial""
+4. SENTENCE: ""The system can generate a hash before storing or sending a transaction and compare it later.""
+   CONTEXT: ""transaction records. >> The system can generate a hash before storing or sending a transaction and compare it later. << If the hash""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 83 / 100
+- Reflected Score: 60 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: FAIL
+- AI Label: Mostly AI
+- CDRP Flags: 4
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 18/25 — Good — Submission: top template and 'Background / Scenario' headers retained — violates instruction to 'Remove all headers'.
+- AI Originality & Effort: 15/25 — Needs Improvement — Submission: Reflection 1 and 2 contain several unanchored rhetorical patterns — matches 'generic phrasing' descriptor.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: Symmetric Encryption section correctly identifies 14 rounds and SubBytes/MixColumns — No Reference — domain knowledge applied.
+- Case Study Application & Justification: 25/25 — Excellent — Part 3: Hybrid Solution section details the Diffie-Hellman/ECC handshake and AES transition — No Reference — domain knowledge applied.
+- TOTAL: 83/100 — Math verified: 18+15+25+25 = 83
+===STUDENT FEEDBACK===
+You demonstrated a high level of technical accuracy in your evaluation of the AFN scenario, particularly in your detailed explanation of the AES-256 internal operations like SubBytes and MixColumns. Your justification for transitioning to ECC P-256 was well-supported by citing the specific performance benefits for mobile battery life and processing overhead. The step-by-step breakdown of the hybrid handshake in Part 3 correctly identifies the transition from asymmetric key exchange to symmetric bulk data encryption.
+
+To improve your submission, ensure that you follow all formatting constraints, such as removing the prompt's headers and objectives before final upload to create a professional report. While your technical analysis is strong, the reflection sections rely on very general phrasing that lacks specific application to the banking context. For future portfolios, try to anchor your ethical and conceptual arguments in the specific details of the case study provided rather than using broad security maxims.
+
+Your technical understanding of cryptographic handshakes is excellent and provides a solid foundation for more advanced security architecture topics.
+
+Your analysis and written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include:
+
+""The main challenge in secure communication is that symmetric and asymmetric cryptography each solve different problems.""
+(Category B — the sentence uses a generic contrast structure that compares two broad categories without referencing the specific banking dilemma or AFN requirements)
+
+""This is dangerous because cryptography is highly complex, and even a small mistake can make the entire system insecure.""
+(Category A — the ""X is Y because Z"" structure functions as a universal security maxim that remains valid regardless of whether the subject is AFN or a different case study)
+
+""A custom algorithm may seem secure at first, but hidden weaknesses may allow attackers to break it easily.""
+(Category B — the rhetorical contrast between perceived security and hidden weaknesses is a portable warning common to general cybersecurity literature)
+
+""The system can generate a hash before storing or sending a transaction and compare it later.""
+(Category C — the description of the hashing workflow uses generic subjects and verbs that lack any specific technical anchors to SHA-256 or the financial records mentioned in the prompt)
+
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly AI,4
+CARL LOWELL DELA PENA,60.0,100,60.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""The main dilemma is that symmetric encryption is fast, but it has a problem with key exchange, while asymmetric encryption is safer for key exchange but slower.""
+   CONTEXT: ""cryptographic system. The >> The main dilemma is that symmetric encryption is fast, but it has a problem with key exchange, while asymmetric encryption is safer for key exchange but slower. << In Symmetric encryption""
+2. SENTENCE: ""The concept of the Avalanche Effect means that even a very small change in the input will produce a completely different hash output.""
+   CONTEXT: ""transaction document? • The >> The concept of the Avalanche Effect means that even a very small change in the input will produce a completely different hash output. << For example, if""
+3. SENTENCE: ""Proper cryptography is hard to create. Even a small mistake in the algorithm, key generation, random number generation, or implementation can cause a vulnerability.""
+   CONTEXT: ""custom encryption algorithms. >> Proper cryptography is hard to create. Even a small mistake in the algorithm, key generation, random number generation, or implementation can cause a vulnerability. << If AFN developers""
+4. SENTENCE: ""Using trusted cryptographic libraries helps reduce the time in development and reduce the risk of hidden weaknesses and implementation errors.""
+   CONTEXT: ""community and experts. >> Using trusted cryptographic libraries helps reduce the time in development and reduce the risk of hidden weaknesses and implementation errors. << 2. How does""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 83 / 100
+- Reflected Score: 60 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: FAIL
+- AI Label: Mostly AI
+- CDRP Flags: 4
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 18/25 — Good — Dela Pena submission: includes the name/date header and scenario text which the instructions explicitly required to be removed.
+- AI Originality & Effort: 15/25 — Needs Improvement — Multiple sections contain generic rhetorical structures identified by CDRP analysis without a Transparency Report.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: AES-256 correctly identifies 14 rounds and the roles of SubBytes (Confusion) and MixColumns (Diffusion).
+- Case Study Application & Justification: 25/25 — Excellent — Part 3: Step-by-step hybrid handshake clearly delineates the role of ECC for key exchange and AES for session encryption.
+- TOTAL: 83/100 — Math verified: 18+15+25+25 = 83
+
+===STUDENT FEEDBACK===
+Your technical explanation of the Advanced Encryption Standard is excellent, particularly your correct identification of the 14 rounds required for AES-256 and the specific roles of SubBytes and MixColumns in providing confusion and diffusion. You also provided a very clear and accurate step-by-step breakdown of the hybrid cryptographic handshake, correctly placing ECC in the key exchange phase and AES in the bulk data encryption phase to solve the AFN performance dilemma.
+
+While your technical accuracy is high, several paragraphs rely on highly generic definitions and rhetorical structures that do not integrate the specific AFN scenario details. To improve, try to weave the AFN scenario into every sentence of your analysis, such as explaining how the Avalanche Effect specifically protects an AFN transaction of ₱1,000 rather than using it as a general example. Additionally, ensure you follow all formatting instructions by removing the activity headers and scenario text from your final submission to provide a clean professional report.
+
+Your understanding of the trade-offs between RSA and ECC is a strong foundation for a career in security architecture. Continue to focus on applying these theoretical concepts to specific real-world constraints.
+
+Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include:
+  ""The main dilemma is that symmetric encryption is fast, but it has a problem with key exchange, while asymmetric encryption is safer for key exchange but slower.""
+  (Category B — the sentence uses a grammatically symmetrical contrast between speed and safety that remains valid for any symmetric/asymmetric comparison regardless of the AFN context)
+  ""The concept of the Avalanche Effect means that even a very small change in the input will produce a completely different hash output.""
+  (Category E — this sentence provides a broad definition of a cryptographic concept that contains no specific application to the financial documents or data mentioned in the prompt)
+  ""Proper cryptography is hard to create. Even a small mistake in the algorithm, key generation, random number generation, or implementation can cause a vulnerability.""
+  (Category E — the text delivers a broad verdict on the difficulty of cryptographic development that would fit any essay on the 'Golden Rule' without modification)
+  ""Using trusted cryptographic libraries helps reduce the time in development and reduce the risk of hidden weaknesses and implementation errors.""
+  (Category E — this concluding thought on library usage is a portable claim about software development that does not reference the specific needs or constraints of the AFN banking platform)
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly AI,4
+GABRIEL JOHN LAMBOJON,95.0,100,95.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""A small mistake can create hidden weaknesses that attackers can exploit.""
+   CONTEXT: ""extremely complex. >> A small mistake can create hidden weaknesses that attackers can exploit. << Standard libraries like""
+2. SENTENCE: ""They are regularly updated and reviewed for vulnerabilities.""
+   CONTEXT: ""experts worldwide. >> They are regularly updated and reviewed for vulnerabilities. << If AFN developers""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 95 / 100
+- Reflected Score: 95 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Mostly Human
+- CDRP Flags: 2
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 25/25 — Excellent — Part 1, Part 2, Part 3, and Reflection sections all present and correctly labeled.
+- AI Originality & Effort: 20/25 — Good — Reflection section contains generic phrasing regarding standard libraries and complexity.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: Symmetric Encryption: ""AES-256... 14 rounds... SubBytes (Confusion) and MixColumns (Diffusion)"" correctly identified.
+- Case Study Application & Justification: 25/25 — Excellent — Part 3: Hybrid Solution: ""ECDH exchange... shared secret... AES session key"" provides a valid step-by-step handshake flow.
+- TOTAL: 95/100 — Math verified: 25+20+25+25 = 95
+===STUDENT FEEDBACK===
+You have demonstrated a strong technical grasp of cryptographic principles, particularly in your explanation of the AES-256 architecture where you correctly identified the number of rounds and the specific roles of SubBytes and MixColumns. Your step-by-step breakdown of the hybrid handshake in Part 3 effectively illustrates how asymmetric and symmetric algorithms collaborate to provide both security and performance. The distinction you made between salt and pepper in Part 1 shows a clear understanding of modern password defense strategies.
+
+While your technical analysis is excellent, the reflection section utilizes somewhat generic language when discussing the dangers of custom cryptography. To improve, you could provide a specific example of a common implementation error, such as a weak initialization vector or a lack of entropy, to further personalize your analysis. Additionally, ensuring that your reflection is as detailed as your technical evaluations will help you achieve the highest marks for originality. You have a solid foundation in these concepts, and your ability to apply them to a specific business scenario like AFN is very effective.
+
+Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+
+""A small mistake can create hidden weaknesses that attackers can exploit.""
+(Category A — the sentence uses a cause-and-effect flourish regarding mistakes and weaknesses that serves as a universal moral warning rather than a technical analysis of a specific AFN vulnerability)
+
+""They are regularly updated and reviewed for vulnerabilities.""
+(Category E — the claim regarding regular updates and reviews is a broad industry standard that functions as a portable conclusion for any discussion on third-party libraries)
+
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly Human,2
+PRIAM REYES,88.0,100,88.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""The principle “never roll your own crypto” is dangerous because cryptographic systems require extensive mathematical analysis and peer review to ensure security.""
+   CONTEXT: ""Reflection 1. According >> The principle “never roll your own crypto” is dangerous because cryptographic systems require extensive mathematical analysis and peer review to ensure security. << If AFN’s developers""
+2. SENTENCE: ""It makes tampering detectable because attackers cannot exploit small changes without being caught.""
+   CONTEXT: ""different hash value. >> It makes tampering detectable because attackers cannot exploit small changes without being caught. << It guarantees data""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 88 / 100
+- Reflected Score: 88 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Mostly Human
+- CDRP Flags: 2
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 15/25 — Needs Improvement — submission: includes all background, scenario, and instruction text contrary to the ""Remove all headers"" directive.
+- AI Originality & Effort: 23/25 — Excellent — Reflection 1: provides specific reasoning regarding the necessity of peer-reviewed libraries like OpenSSL.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: correctly identifies SubBytes as the source of confusion and MixColumns as the source of diffusion.
+- Case Study Application & Justification: 25/25 — Excellent — Part 3: details a highly accurate 5-step TLS 1.3-style handshake including ECDHE and session key derivation.
+- TOTAL: 88/100 — Math verified: 15+23+25+25 = 88
+===STUDENT FEEDBACK===
+You demonstrated a high level of technical proficiency in your analysis of cryptographic operations, particularly in your detailed explanation of the Advanced Encryption Standard. Your description of how SubBytes and MixColumns provide confusion and diffusion respectively shows a strong grasp of symmetric cipher mechanics. Additionally, your formulation of the hybrid handshake in Part 3 correctly identifies the role of Elliptic Curve Diffie-Hellman Ephemeral in establishing secure session keys for mobile environments.
+
+The primary area for improvement in this submission is your adherence to document formatting constraints. You included the entire background scenario and instructions in your final file, which contradicts the specific instruction to remove all headers and rubric before uploading. For future portfolios, ensure that your final document contains only your original analysis and responses to maintain a professional and clean presentation.
+
+Overall, your technical justifications for transitioning from legacy RSA to ECC are compelling and well-aligned with modern mobile banking requirements. Keep focusing on these detailed technical applications as they reflect a university-level understanding of cybersecurity architecture.
+
+Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+
+""The principle “never roll your own crypto” is dangerous because cryptographic systems require extensive mathematical analysis and peer review to ensure security.""
+(Category E — the sentence offers a broad technical verdict on the necessity of peer review that would remain valid in any cryptographic discussion without modification.)
+
+""It makes tampering detectable because attackers cannot exploit small changes without being caught.""
+(Category A — the phrase ""cannot exploit small changes without being caught"" serves as a generic rhetorical flourish to explain data integrity that is not anchored to the specific AFN case.)
+
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly Human,2
+PAULA PAREDES,95.0,100,95.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""Security should rely on trusted and peer reviewed technology, not experimental code.""
+   CONTEXT: ""not experimental code. >> Security should rely on trusted and peer reviewed technology, not experimental code. << [End of section]""
+2. SENTENCE: ""Instead of spending time building custom encryption, developers can focus on properly implementing secure systems that are already proven to work.""
+   CONTEXT: ""already proven to work. >> Instead of spending time building custom encryption, developers can focus on properly implementing secure systems that are already proven to work. << For a financial""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 95 / 100
+- Reflected Score: 95 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Mostly Human
+- CDRP Flags: 2
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 20/25 — Good — Reflection section: includes all background and instruction text which was directed to be removed.
+- AI Originality & Effort: 25/25 — Excellent — Reflection section: provides thoughtful analysis on the ""Golden Rule"" and the Avalanche Effect.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: correctly identifies AES-256 operations SubBytes as Confusion and MixColumns as Diffusion.
+- Case Study Application & Justification: 25/25 — Excellent — Part 3: provides a detailed 5-step hybrid handshake utilizing ECDH and AES-256.
+- TOTAL: 95/100 — Math verified: 20+25+25+25 = 95
+===STUDENT FEEDBACK===
+You demonstrated exceptional technical clarity in your comparison between RSA and ECC, specifically by citing the security equivalence of a 256-bit ECC key to a 3072-bit RSA key. Your explanation of the hybrid handshake in Part 3 successfully mapped the mathematical transition from asymmetric key exchange to symmetric bulk encryption. The inclusion of the Avalanche Effect in your reflection on document integrity shows a deep understanding of how hashing functions protect financial data.
+
+While your technical content is excellent, you failed to follow the specific formatting instruction to remove all headers, objectives, and background scenario text from your final submission. In future portfolios, ensure you submit only your original analysis and answers to maintain a clean and professional document. Please also verify that your file naming convention matches the required format before uploading to the submission bin.
+
+Your grasp of cryptographic principles is very strong and your justification for algorithm replacements was mathematically sound. Continue to apply this level of detail to your future case studies as it reflects a high level of preparation for professional security architecture roles.
+
+Your reflection contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include:
+""Security should rely on trusted and peer reviewed technology, not experimental code.""
+(Category E — the sentence delivers a broad ethical verdict on technology choice using the ""X, not Y"" contrast which functions independently of the AFN case study)
+""Instead of spending time building custom encryption, developers can focus on properly implementing secure systems that are already proven to work.""
+(Category E — the ""Instead of X, [subject] can Y"" construction provides a portable recommendation for software development that does not rely on the specific cryptographic algorithms discussed)",success,Mostly Human,2
+KURT MICHAEL MIRAFELIX,95.0,100,95.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""MD5 is considered broken because it is old, fast, and has many known security weaknesses.""
+   CONTEXT: ""MD5 Vulnerability: >> MD5 is considered broken because it is old, fast, and has many known security weaknesses. << Attackers were able""
+2. SENTENCE: ""A salt is a random value added to each user’s password before hashing, which ensures that even if two users have the same password, their hashes will still be completely different.""
+   CONTEXT: ""based on SHA-256 >> A salt is a random value added to each user’s password before hashing, which ensures that even if two users have the same password, their hashes will still be completely different. << This prevents attackers""
+3. SENTENCE: ""The main dilemma between symmetric and asymmetric cryptography is the trade-off between speed and secure key exchange.""
+   CONTEXT: ""Implementation • The >> The main dilemma between symmetric and asymmetric cryptography is the trade-off between speed and secure key exchange. << Symmetric encryption algorithms""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+--- FORMAT A (flags = 0, or valid TR, or flags 0–4 without TR — no score penalty):
+- Rubric Score: 95 / 100
+- Reflected Score: 95 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Human Written
+- CDRP Flags: 0
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 20/25 — Good — Submission: Includes prohibited personal identification header and utilizes bullet points instead of lettered sub-items. No Reference — domain knowledge applied.
+- AI Originality & Effort: 25/25 — Excellent — Submission: Reflection section — provides specific, non-boilerplate analysis of OpenSSL and libsodium. No Reference — domain knowledge applied.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Submission: Part 2 — correctly defines SubBytes for confusion and MixColumns for diffusion. No Reference — domain knowledge applied.
+- Case Study Application & Justification: 25/25 — Excellent — Submission: Part 3 — provides a technically sound step-by-step handshake using ECDH and AES-256. No Reference — domain knowledge applied.
+- TOTAL: 95/100 — Math verified: 20+25+25+25 = 95
+===STUDENT FEEDBACK===
+You demonstrated a strong grasp of cryptographic principles by correctly identifying the specific operations within the AES algorithm, specifically citing the roles of SubBytes for confusion and MixColumns for diffusion in Part 2. Your analysis of the AFN scenario was particularly effective in Part 3, where you clearly justified the transition to Elliptic Curve Cryptography and provided a technically accurate step-by-step hybrid handshake using ECDH and AES-256. The inclusion of specific libraries like OpenSSL and libsodium in your reflection shows a good understanding of industry-standard security practices.
+
+While your technical content is excellent, your formatting deviates slightly from the rubric's requirements. To improve, ensure you remove all personal identification headers from the document before submission and use lettered sub-items for your responses rather than bullet points. Additionally, you could provide a more detailed mathematical explanation of how a ""pepper"" differs from a ""salt"" in terms of storage location to further enhance your security architecture proposal for the AFN banking platform.
+
+Overall, this is a highly professional submission that effectively addresses the security needs of a mobile-first digital bank. Keep focusing on these detailed technical justifications in your future security architecture designs.",success,Human Written,0
+KURT CADORNA,0.0,100,0.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""The Message Digest 5 (MD5) algorithm is fundamentally broken due to structural design flaws that render it vulnerable to a state where two distinct inputs yield an identical hash output.""
+   CONTEXT: ""stolen database. >> The Message Digest 5 (MD5) algorithm is fundamentally broken due to structural design flaws that render it vulnerable to a state where two distinct inputs yield an identical hash output. << MD5 executes at""
+2. SENTENCE: ""Salting ensures that identical passwords generate completely unique hashes.""
+   CONTEXT: ""account creation. >> Salting ensures that identical passwords generate completely unique hashes. << This mathematically neutralizes""
+3. SENTENCE: ""This introduces confusion, ensuring that the relationship between the encryption key and the resulting ciphertext is too complex for an attacker to deduce mathematically.""
+   CONTEXT: ""(S-box). >> This introduces confusion, ensuring that the relationship between the encryption key and the resulting ciphertext is too complex for an attacker to deduce mathematically. << And MixColumns (Diffusion),""
+4. SENTENCE: ""When engineering an enterprise network architecture, architects face a structural trade-off between symmetric and asymmetric cryptography.""
+   CONTEXT: ""implementation >> When engineering an enterprise network architecture, architects face a structural trade-off between symmetric and asymmetric cryptography. << Symmetric Cryptography, Exceptionally""
+5. SENTENCE: ""The 'Golden Rule' of Cryptography emphasizes that one should 'Never roll your own crypto' because designing cryptographic primitives is a highly specialized discipline prone to subtle, catastrophic implementation flaws.""
+   CONTEXT: ""libsodium)? >> The 'Golden Rule' of Cryptography emphasizes that one should 'Never roll your own crypto' because designing cryptographic primitives is a highly specialized discipline prone to subtle, catastrophic implementation flaws. << Standardized, peer-reviewed libraries""
+6. SENTENCE: ""The Avalanche Effect is a mathematical design property of modern hashing algorithms where a microscopic alteration to the input string cascades unpredictably across the output digest.""
+   CONTEXT: ""document? >> The Avalanche Effect is a mathematical design property of modern hashing algorithms where a microscopic alteration to the input string cascades unpredictably across the output digest. << In a secure""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score (before AI penalty): 71 / 100
+- AI Penalty Applied: Score set to 0 — pervasive CDRP detected without Transparency Report
+- Reflected Score: 0 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: FAIL
+- AI Label: AI Generated
+- CDRP Flags: 6
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 11/25 — Needs Improvement — [submission: start of text + ""Republic of the Philippines"" + University header and prompt instructions retained]
+- AI Originality & Effort: 10/25 — Poor — [submission: Part 1 + ""The Message Digest 5 (MD5)..."" + pervasive detached formal register]
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — [submission: Part 2 + ""SubBytes (Confusion)... MixColumns (Diffusion)"" + correct operational descriptions]
+- Case Study Application & Justification: 25/25 — Excellent — [submission: Part 3 + ""ClientHello... ServerHello... Master Secret"" + detailed 4-step hybrid handshake]
+- TOTAL: 71/100 — Math verified: 11+10+25+25 = 71
+===STUDENT FEEDBACK===
+You demonstrated a high level of technical accuracy in your explanation of the Advanced Encryption Standard, particularly in your descriptions of the SubBytes and MixColumns operations. Your breakdown of the hybrid cryptographic handshake in Part 3 provides a clear, step-by-step logical flow that correctly identifies how ephemeral keys and symmetric session keys interact. Additionally, your comparison between RSA and ECC key sizes shows a strong grasp of the performance requirements necessary for mobile-first environments like the Aegis Financial Network.
+
+One significant area for improvement is your adherence to the formatting instructions, as you included the university headers and the original prompt text which should have been removed prior to submission. Furthermore, while your technical definitions are accurate, much of the phrasing in sections like the MD5 analysis and the reflection on the ""Golden Rule"" follows a highly formal, generic register that lacks a unique personal voice. To improve, try to synthesize these concepts by explaining them in the context of specific AFN banking features rather than relying on standard textbook definitions. You should also ensure that your submission file is a clean document containing only your original analysis to meet professional reporting standards.
+
+Focus on developing your own technical voice in future case studies to better demonstrate your individual analytical process. Reviewing the university's guidelines on document formatting will also help you present your work more professionally.
+
+Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+""[The Message Digest 5 (MD5) algorithm is fundamentally broken due to structural design flaws that render it vulnerable to a state where two distinct inputs yield an identical hash output.]""
+(Category C — this sentence provides a textbook definition of collision vulnerability that remains valid in any discussion of MD5 regardless of the AFN scenario)
+""[Salting ensures that identical passwords generate completely unique hashes.]""
+(Category C — removing the technical terms leaves a functional description that is portable to any security context involving data variability)
+""[This introduces confusion, ensuring that the relationship between the encryption key and the resulting ciphertext is too complex for an attacker to deduce mathematically.]""
+(Category A — the ""ensuring that... is too complex"" construction functions as a rhetorical flourish to amplify the importance of confusion without adding case-specific reasoning)
+""[When engineering an enterprise network architecture, architects face a structural trade-off between symmetric and asymmetric cryptography.]""
+(Category D — this transition serves as a generic framing device that provides no specific details about the AFN banking environment)
+""[The 'Golden Rule' of Cryptography emphasizes that one should 'Never roll your own crypto' because designing cryptographic primitives is a highly specialized discipline prone to subtle, catastrophic implementation flaws.]""
+(Category E — the sentence delivers a broad professional verdict that would be coherent in any submission regarding cryptographic development standards)
+""[The Avalanche Effect is a mathematical design property of modern hashing algorithms where a microscopic alteration to the input string cascades unpredictably across the output digest.]""
+(Category C — the definition of the avalanche effect is contextually detached and could be used to describe any hashing algorithm in any technical report)
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,AI Generated,6
+IAN LEMUEL VERGARA,60.0,100,60.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""The main dilemma between symmetric and asymmetric cryptography is balancing speed and secure key exchange.""
+   CONTEXT: ""key exchange. >> The main dilemma between symmetric and asymmetric cryptography is balancing speed and secure key exchange. << Symmetric encryption algorithms""
+2. SENTENCE: ""This hybrid approach combines the strengths of both systems.""
+   CONTEXT: ""encrypted using AES. >> This hybrid approach combines the strengths of both systems. << ECC provides secure""
+3. SENTENCE: ""Using trusted libraries reduces the risk of vulnerabilities caused by implementation mistakes.""
+   CONTEXT: ""security experts worldwide. >> Using trusted libraries reduces the risk of vulnerabilities caused by implementation mistakes. << If AFN developers""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 81 / 100
+- Reflected Score: 60 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: FAIL
+- AI Label: Mostly AI
+- CDRP Flags: 3
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 18/25 — Good — Ian Lemuel A. Vergara submission: prompt text and scenario headers retained despite instructions to remove them.
+- AI Originality & Effort: 13/25 — Needs Improvement — Reflection sections: contains generic phrasing and multiple unanchored rhetorical patterns consistent with AI generation.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: Symmetric Encryption: correctly identifies SubBytes for confusion and MixColumns for diffusion.
+- Case Study Application & Justification: 25/25 — Excellent — Part 3: Hybrid Solution: accurately details the ECDHE and AES session key derivation process within the handshake.
+- TOTAL: 81/100 — Math verified: 18+13+25+25 = 81
+===STUDENT FEEDBACK===
+You demonstrated a high level of technical accuracy in your explanation of cryptographic primitives, particularly in your detailed breakdown of the AES internal operations like SubBytes and MixColumns. Your description of the hybrid handshake in Part 3 correctly identifies the transition from asymmetric key exchange to symmetric bulk encryption, showing a clear understanding of the TLS 1.3 flow.
+
+However, the submission failed to follow several formatting directives, such as removing the prompt headers and using the required lettered sub-item structure for each part. You should ensure that future portfolios are cleaned of all instructional text to meet professional presentation standards. Additionally, the analysis in your reflection section is quite generic; providing specific examples of how a custom algorithm might fail in a banking context would have strengthened your argument.
+
+Continue to refine your technical writing by focusing on case-specific details rather than general definitions. This will help demonstrate your unique synthesis of the material.
+
+Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+""The main dilemma between symmetric and asymmetric cryptography is balancing speed and secure key exchange.""
+(Category B — the ""balancing X and Y"" structure creates a rhetorical contrast that functions as a universal definition in cryptography, independent of the AFN case study.)
+""This hybrid approach combines the strengths of both systems.""
+(Category E — the sentence uses a generic summary structure that provides a conclusion without referencing the specific interaction of ECC and AES mentioned in the surrounding text.)
+""Using trusted libraries reduces the risk of vulnerabilities caused by implementation mistakes.""
+(Category A — the sentence functions as a universal security maxim where the ""Using X reduces Y"" construction provides a general best-practice statement applicable to any software development context.)",success,Mostly AI,3
+LLOYD PERIDO,95.0,100,95.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""a trade-off. >> Cryptography always comes with a trade-off. << Symmetric encryption (like""):
+1. SENTENCE: ""Cryptography always comes with a trade-off.""
+   CONTEXT: ""a trade-off. >> Cryptography always comes with a trade-off. << Symmetric encryption (like""
+2. SENTENCE: ""Trying to create custom encryption is extremely risky because cryptography is not something that can be done safely without deep expertise and years of testing.""
+   CONTEXT: ""matters 1. >> Trying to create custom encryption is extremely risky because cryptography is not something that can be done safely without deep expertise and years of testing. << Even small design""
+3. SENTENCE: ""The Avalanche Effect means that even a tiny change in input will completely change the output of a hash like SHA-256.""
+   CONTEXT: ""integrity 2. >> The Avalanche Effect means that even a tiny change in input will completely change the output of a hash like SHA-256. << For example, changing""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 95 / 100
+- Reflected Score: 95 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Mostly Human
+- CDRP Flags: 2
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 25/25 — Excellent — Part 1: a. MD5 Vulnerability — structured with lettered sub-items.
+- AI Originality & Effort: 20/25 — Good — Reflection: 1. Why “Never roll your own crypto” matters — content is accurate but utilizes generic textbook definitions.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2a: SubBytes (Confusion) and MixColumns (Diffusion) correctly explained.
+- Case Study Application & Justification: 25/25 — Excellent — Part 3b: ECC-based Diffie-Hellman and AES collaboration — clear step-by-step hybrid logic.
+- TOTAL: 95/100 — Math verified: 25+20+25+25 = 95
+
+===STUDENT FEEDBACK===
+You have submitted a very well-structured case study that accurately addresses the cryptographic failures of the Aegis Financial Network. Your explanation of the Advanced Encryption Standard in Part 2a correctly identifies the roles of SubBytes and MixColumns in achieving confusion and diffusion, which demonstrates a strong grasp of symmetric block cipher operations. Furthermore, your design for the hybrid cryptographic handshake in Part 3b effectively illustrates how ECC and AES function together to secure mobile banking sessions.
+
+While your technical accuracy is high, the reflection section relies on fairly standard definitions of cryptographic principles. To improve this, you could provide a specific example of how the Avalanche Effect would manifest in an AFN transaction, such as showing how changing a single digit in a ""Transfer Amount"" field would result in a completely unrecognizable SHA-256 hash. This would move your analysis from a general textbook definition to a specific case-study application.
+
+Overall, this is a strong submission that shows you understand the practical trade-offs between performance and security in modern mobile environments. Keep focusing on these specific applications in future portfolios.
+
+Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+""Cryptography always comes with a trade-off.""
+(Category E — the sentence functions as a broad opening verdict that would remain valid in any technical analysis of competing technologies, as it lacks any specific reference to AFN or the specific algorithms.)
+""Trying to create custom encryption is extremely risky because cryptography is not something that can be done safely without deep expertise and years of testing.""
+(Category E — this delivers a universal technical warning that does not rely on the AFN scenario; the ""not something that can be done safely without X"" construction is a portable rhetorical frame.) Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly Human,2
+JASMYN JAPAG,60.0,100,60.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""Even a small mistake in the algorithm design can introduce weaknesses that attackers may exploit immediately.""
+   CONTEXT: ""expert analysis. >> Even a small mistake in the algorithm design can introduce weaknesses that attackers may exploit immediately. << Standardized cryptographic libraries""
+2. SENTENCE: ""This is very important for mobile banking applications because smartphones have limited battery capacity and hardware resources.""
+   CONTEXT: ""bandwidth. This >> This is very important for mobile banking applications because smartphones have limited battery capacity and hardware resources. << Faster handshakes also""
+3. SENTENCE: ""This helps guarantee the integrity and authenticity of financial data, which is very important in digital banking systems where customers rely on accurate and trustworthy transaction records.""
+   CONTEXT: ""tampered with. >> This helps guarantee the integrity and authenticity of financial data, which is very important in digital banking systems where customers rely on accurate and trustworthy transaction records. << ""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 85 / 100
+- Reflected Score: 60 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: FAIL
+- AI Label: Mostly AI
+- CDRP Flags: 3
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 20/25 — Good — Submission includes original prompt headers; minor deviation from ""remove all headers"" instruction.
+- AI Originality & Effort: 15/25 — Needs Improvement — Submission contains multiple unanchored generic phrases and lacks a Transparency Report.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: correctly identifies AES-256 rounds (14) and operations (SubBytes/MixColumns).
+- Case Study Application & Justification: 25/25 — Excellent — Part 3: provides a technically accurate step-by-step TLS 1.3 handshake including ECDH and session keys.
+- TOTAL: 85/100 — Math verified: 20+15+25+25 = 85
+===STUDENT FEEDBACK===
+You demonstrated a high level of technical accuracy in your explanation of cryptographic primitives, particularly in how you distinguished between the confusion provided by SubBytes and the diffusion provided by MixColumns in the AES-256 algorithm. Your detailed walkthrough of the hybrid handshake in Part 3 correctly identifies the roles of Elliptic Curve Diffie-Hellman for key exchange and AES for bulk data encryption.
+
+To improve your work, ensure you follow all formatting constraints, such as the instruction to remove prompt headers before final submission. While your technical descriptions are correct, your analysis would benefit from more specific references to the AFN banking environment, such as mentioning specific mobile operating systems or transaction types. You should also include a Transparency Report to clarify your use of external tools or AI assistants in generating your responses.
+
+Your understanding of the mathematical foundations of cryptography is strong, and applying this to real-world infrastructure overhauls is a critical skill for a security architect.
+
+Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+
+""Even a small mistake in the algorithm design can introduce weaknesses that attackers may exploit immediately.""
+(Category E — the ""Even a... can..."" structure functions as a broad ethical verdict on security design that remains valid in any cybersecurity context without referencing specific code or AFN-specific constraints)
+
+""This is very important for mobile banking applications because smartphones have limited battery capacity and hardware resources.""
+(Category E — the logic regarding battery capacity and hardware resources is a general mobile development principle that survives transplantation to any mobile-related activity)
+
+""This helps guarantee the integrity and authenticity of financial data, which is very important in digital banking systems where customers rely on accurate and trustworthy transaction records.""
+(Category E — the sentence delivers a broad ethical verdict on the importance of trust in banking that is entirely independent of the technical discussion of the Avalanche Effect)
+
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly AI,3
+JOHN LESTER ACBANG,91.0,100,91.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""SHA-256 is a cryptographic hashing algorithm that turns any input (like a password or file) into a fixed 256-bit output called a hash.""
+   CONTEXT: ""completely ineffective. - SHA-256 >> SHA-256 is a cryptographic hashing algorithm that turns any input (like a password or file) into a fixed 256-bit output called a hash. << ( AI ) -""
+2. SENTENCE: ""AES-256 is a symmetric encryption method used to secure data like messages and banking info.""
+   CONTEXT: ""and key exchange. - AES-256 >> AES-256 is a symmetric encryption method used to secure data like messages and banking info. << ( AI ) -""
+3. SENTENCE: ""TLS 1.3 (Transport Layer Security 1.3) is the newest version of a security protocol used to protect data sent over the internet.""
+   CONTEXT: ""data encryption. - TLS 1.3 >> TLS 1.3 (Transport Layer Security 1.3) is the newest version of a security protocol used to protect data sent over the internet. << ( AI ) -""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 91 / 100
+- Reflected Score: 91 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Mostly Human
+- CDRP Flags: 3
+- Transparency Report: Present and reflective
+CRITERIA:
+- Following Instructions & Formatting: 18/25 — Good — Part 1-3 content complete but failed to remove CvSU header, Objectives, and Background sections.
+- AI Originality & Effort: 23/25 — Excellent — Student used explicit markers to identify AI-generated definitions while providing original synthesis for the application.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Correctly identifies SubBytes for confusion and MixColumns for diffusion; accurate Salt/Pepper distinction.
+- Case Study Application & Justification: 25/25 — Excellent — Logical flow for the ECC-to-AES hybrid handshake and strong justification for ECC in mobile contexts.
+- TOTAL: 91/100 — Math verified: 18+23+25+25 = 91
+===STUDENT FEEDBACK===
+You provided a very strong technical justification for transitioning to Elliptic Curve Cryptography, specifically noting the critical relationship between smaller key sizes and battery life for mobile banking users. Your explanation of the Advanced Encryption Standard correctly identifies the roles of SubBytes and MixColumns in achieving confusion and diffusion for the AFN user database. The reflection on the Avalanche Effect effectively demonstrates how a single character change in a transaction document would be immediately detectable through hash mismatch.
+
+You must ensure that all activity headers, objectives, and background scenario text are removed from your final document to meet the clean submission requirement. While your technical analysis is excellent, following the specific formatting constraints regarding what text to exclude is necessary for a professional-level report.
+
+Your honesty regarding the use of AI for standard definitions is appreciated and shows a high level of academic integrity. Thank you for including your Transparency Report and for being upfront about your use of AI tools in this submission.",success,Human Written,0
+NEIL ANGELO CRISOSTOMO,60.0,100,60.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""MD5 is classified as broken because it suffers from severe collision vulnerabilities, meaning different inputs can easily produce the exact same hash value.""
+   CONTEXT: ""database hashes using >> MD5 is classified as broken because it suffers from severe collision vulnerabilities, meaning different inputs can easily produce the exact same hash value. << This structural weakness""
+2. SENTENCE: ""The salt is a random string added to each user password individually, which forces attackers to compute a brand new table for every single account.""
+   CONTEXT: ""before hashing. The >> The salt is a random string added to each user password individually, which forces attackers to compute a brand new table for every single account. << The pepper is""
+3. SENTENCE: ""Writing your own custom encryption algorithms is extremely dangerous because real security requires years of open peer review by mathematical experts to find hidden structural flaws.""
+   CONTEXT: ""libsodium)? Writing >> Writing your own custom encryption algorithms is extremely dangerous because real security requires years of open peer review by mathematical experts to find hidden structural flaws. << Standardized libraries like""
+4. SENTENCE: ""If an attacker tries to maliciously alter a single digit or decimal point inside a financial transaction record, the resulting hash will look entirely different from the original version.""
+   CONTEXT: ""transaction document? If >> If an attacker tries to maliciously alter a single digit or decimal point inside a financial transaction record, the resulting hash will look entirely different from the original version. << By simply comparing""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 78 / 100
+- Reflected Score: 60 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: FAIL
+- AI Label: Mostly AI
+- CDRP Flags: 4
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 13/25 — Needs Improvement — Submission: Instructions and Background headers retained — violates ""Remove all headers and rubric"" directive.
+- AI Originality & Effort: 15/25 — Needs Improvement — Submission: Analysis relies on generic structural templates (4 flags) — lacks profound original synthesis.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: Symmetric Encryption — ""SubBytes operation swaps bytes... MixColumns operation scrambles data"" — No Reference — domain knowledge applied.
+- Case Study Application & Justification: 25/25 — Excellent — Part 3: Hybrid Solution — ""Diffie Hellman algorithm with ECC... switch to AES 256"" — No Reference — domain knowledge applied.
+- TOTAL: 78/100 — Math verified: 13+15+25+25 = 78
+
+===STUDENT FEEDBACK===
+Your technical accuracy regarding cryptographic operations is excellent, specifically your detailed explanation of the SubBytes and MixColumns operations within the AES framework. You correctly identified the performance benefits of transitioning to ECC P-256 for mobile environments compared to the heavy overhead of legacy RSA-1024. The hybrid handshake description in Part 3 provides a clear and logically sound flow of how session keys are established using Diffie-Hellman before switching to bulk encryption.
+
+You must remove all instruction headers and background scenario text from your final submission as explicitly required in the activity guidelines. While your technical definitions are correct, the phrasing in several sections relies heavily on generic textbook descriptions rather than original analysis tailored to the AFN case. To improve, try to anchor your explanations more deeply into the specific financial data types handled by the banking platform. Ensure your future submissions are strictly formatted according to the provided instructions to avoid significant point deductions in the formatting category.
+
+Your understanding of the underlying mathematical concepts in cryptography is strong. Focus on developing your own voice in your technical writing to better demonstrate your critical thinking skills.
+
+Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+
+""MD5 is classified as broken because it suffers from severe collision vulnerabilities, meaning different inputs can easily produce the exact same hash value.""
+(Category C — the ""is classified as X because it suffers from Y"" structure provides a generic definition of brokenness that does not rely on the specific AFN scenario)
+
+""The salt is a random string added to each user password individually, which forces attackers to compute a brand new table for every single account.""
+(Category C — this sentence explains the mechanic of salting in a way that remains valid for any password system, lacking any specific AFN implementation details)
+
+""Writing your own custom encryption algorithms is extremely dangerous because real security requires years of open peer review by mathematical experts to find hidden structural flaws.""
+(Category E — the ""is extremely dangerous because X requires Y"" construction provides a portable ethical verdict that applies to any software development context)
+
+""If an attacker tries to maliciously alter a single digit or decimal point inside a financial transaction record, the resulting hash will look entirely different from the original version.""
+(Category A — this provides a universal description of the avalanche effect using an ""If X, then Y"" flourish that is not anchored to a specific document or transaction type)
+
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly AI,4
+CHARLIZE ELLAINE DIZOR,95.0,100,95.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""Custom encryption is dangerous because it hasn’t been tested by experts.""
+   CONTEXT: ""libsodium)? >> Custom encryption is dangerous because it hasn’t been tested by experts. << Even small mistakes""
+2. SENTENCE: ""Even small mistakes can fully break security without developers noticing.""
+   CONTEXT: ""by experts. >> Even small mistakes can fully break security without developers noticing. << Standard libraries like""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 95 / 100
+- Reflected Score: 95 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Mostly Human
+- CDRP Flags: 2
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 20/25 — Good — submission: bullet points used instead of lettered sub-items.
+- AI Originality & Effort: 25/25 — Excellent — reflection: references lesson material and AFN scenario specifically.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: SubBytes (confusion) and MixColumns (diffusion) correctly defined.
+- Case Study Application & Justification: 25/25 — Excellent — Part 3: Hybrid Solution steps 1-5 correctly map TLS 1.3 flow.
+- TOTAL: 95/100 — Math verified: 20+25+25+25 = 95
+===STUDENT FEEDBACK===
+You demonstrated a strong technical grasp of cryptographic principles, particularly in your explanation of the Advanced Encryption Standard internal operations. Your breakdown of the SubBytes and MixColumns functions in Part 2 correctly identifies their roles in providing confusion and diffusion. Additionally, your step-by-step formulation of the hybrid handshake in Part 3 shows a clear understanding of how ECDHE and AES collaborate to secure modern mobile communications.
+
+While your content is highly accurate, there is a minor formatting deviation regarding the structure of your sub-items. The rubric specifically looks for lettered sub-items to organize the analysis, but your submission utilizes generic bullet points instead. For future portfolios, ensure you follow the structural requirements exactly by using letters like a, b, and c to delineate your responses. This will help maintain the professional formatting expected in technical case studies.
+
+Your analysis of the MD5 vulnerability and the implementation of salts and peppers was particularly well-applied to the AFN scenario.
+
+Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include:
+""Custom encryption is dangerous because it hasn’t been tested by experts.""
+(Category E — the sentence uses a generic causal structure to state a broad security principle that does not depend on the specific AFN scenario or cryptographic algorithms)
+""Even small mistakes can fully break security without developers noticing.""
+(Category E — this phrase functions as a portable warning about software vulnerability; removing the context of the essay leaves a general statement that would be valid in any discussion of coding errors)
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly Human,2
+KING JUSTIN BARORO,60.0,100,60.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""Creating a custom encryption algorithm is very risky because effective cryptography is not merely about complexity.""
+   CONTEXT: ""Reflection: 1. >> Creating a custom encryption algorithm is very risky because effective cryptography is not merely about complexity. << It needs years""
+2. SENTENCE: ""It needs years of peer review, mathematical testing, and real-world attack attempts by many experts before it can be trusted.""
+   CONTEXT: ""about complexity. >> It needs years of peer review, mathematical testing, and real-world attack attempts by many experts before it can be trusted. << A developer at""
+3. SENTENCE: ""Using these established libraries is not laziness; it is a responsible and correct way to protect user data.""
+   CONTEXT: ""actual attacks. >> Using these established libraries is not laziness; it is a responsible and correct way to protect user data. << 2. The Avalanche""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 81 / 100
+- Reflected Score: 60 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: FAIL
+- AI Label: Mostly AI
+- CDRP Flags: 3
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 16/25 — Good — Answer: includes prompt headers and full rubric despite instructions to remove them.
+- AI Originality & Effort: 15/25 — Needs Improvement — Reflection: contains multiple generic rhetorical structures and boilerplate phrasing.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Answer: 2. correctly cites 14 rounds for AES-256 and defines SubBytes and MixColumns operations.
+- Case Study Application & Justification: 25/25 — Excellent — Answer: 3. provides a detailed TLS 1.3 handshake flow using ECC and AES-256.
+- TOTAL: 81/100 — Math verified: 16+15+25+25 = 81
+
+===STUDENT FEEDBACK===
+You demonstrated excellent technical depth in your explanation of the Advanced Encryption Standard, specifically regarding the fourteen rounds of transformation and the roles of SubBytes and MixColumns in establishing confusion and diffusion. Your description of the hybrid handshake flow in Part 3 correctly identifies how TLS 1.3 utilizes Elliptic Curve Diffie-Hellman for key exchange before transitioning to AES for bulk data encryption. These sections show a strong grasp of the mathematical collaboration between symmetric and asymmetric systems.
+
+Your submission failed to follow the formatting instruction to remove the prompt headers and rubric before uploading, which resulted in a cluttered document that includes the original assignment text. The reflection section relies on generic phrasing and rhetorical structures that do not specifically address the unique risks faced by the AFN development team or their specific infrastructure. To improve, ensure you clean your final document of all instructional text and ground your ethical analysis in the specific organizational context and consequences provided in the case study.
+
+While you have a strong understanding of the technical concepts, your final score is impacted by the use of highly portable, non-specific language in your analysis. Focus on developing your own voice by connecting cryptographic theory to the specific banking scenario provided.
+
+Your reflection contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+""Creating a custom encryption algorithm is very risky because effective cryptography is not merely about complexity.""
+(Category A — the ""is not merely about X"" phrasing creates a rhetorical contrast that defines the nature of cryptography without referencing the specific AFN scenario)
+""It needs years of peer review, mathematical testing, and real-world attack attempts by many experts before it can be trusted.""
+(Category E — the sentence lists three generic criteria for cryptographic trust that function as a universal verdict applicable to any security discussion)
+""Using these established libraries is not laziness; it is a responsible and correct way to protect user data.""
+(Category A — the ""is not X; it is Y"" structure delivers a moralizing statement about developer responsibility that remains valid regardless of the specific software library mentioned)
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly AI,3
+TRISHA CARIAS,95.0,100,95.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged phrase] << [3 words after]""):
+No CDRP candidates identified.
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 95 / 100
+- Reflected Score: 95 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Human Written
+- CDRP Flags: 0
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 20/25 — Good — Submission text: used bullet points instead of the requested lettered sub-items.
+- AI Originality & Effort: 25/25 — Excellent — Submission text: provides deep synthesis of confusion/diffusion mechanisms in AES.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 1: ""MD5 lacks built-in salting and is vulnerable to collisions"" — accurate technical assessment.
+- Case Study Application & Justification: 25/25 — Excellent — Part 3: ""Hybrid Solution"" field — provides a detailed 8-step handshake flow including ECDHE and AES-256-GCM.
+- TOTAL: 95/100 — Math verified: 20+25+25+25 = 95
+===STUDENT FEEDBACK===
+You have demonstrated a sophisticated understanding of cryptographic principles, particularly in your explanation of the Advanced Encryption Standard. Your analysis of how SubBytes and MixColumns provide confusion and diffusion is technically precise and correctly identifies their roles in securing data. Furthermore, your step-by-step breakdown of the hybrid handshake in Part 3 shows a clear grasp of how ECC and AES collaborate to secure modern mobile banking communications.
+
+To further improve your submission, ensure you follow all structural requirements, such as using lettered sub-items for each section as specified in the instructions. While your bullet points are clear, adhering to the specific formatting requests is essential for professional technical documentation. You might also consider explicitly mentioning the specific bit-length of the salt in your defense strategy to further strengthen the mathematical justification.
+
+Your work shows a high level of academic rigor and a strong ability to apply theoretical concepts to a practical business scenario. Keep maintaining this level of technical detail in your future portfolios.",success,Human Written,0
+SHANAIA LEE BACOS,0.0,100,0.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""The challenge is finding a balance between secure key exchange and fast data encryption.""
+   CONTEXT: ""computational resources. The >> The challenge is finding a balance between secure key exchange and fast data encryption. << AFN should implement""
+2. SENTENCE: ""This hybrid approach combines the strong key exchange capabilities of ECC with the speed and efficiency of AES.""
+   CONTEXT: ""discarded to maintain security. >> This hybrid approach combines the strong key exchange capabilities of ECC with the speed and efficiency of AES. << 1. According to""
+3. SENTENCE: ""Using these proven libraries reduces the risk of implementation errors and improves overall system security.""
+   CONTEXT: ""security experts worldwide. >> Using these proven libraries reduces the risk of implementation errors and improves overall system security. << 2. How does""
+4. SENTENCE: ""This guarantees the integrity and authenticity of financial transaction records.""
+   CONTEXT: ""document has been altered. >> This guarantees the integrity and authenticity of financial transaction records. << Submission Format ●""
+5. SENTENCE: ""This upgraded hashing architecture greatly improves password security and resistance against brute-force attacks.""
+   CONTEXT: ""steal the database. >> This upgraded hashing architecture greatly improves password security and resistance against brute-force attacks. << Part 2: Algorithm""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+--- FORMAT C (flags >= 5, no valid Transparency Report — score penalty):
+- Rubric Score (before AI penalty): 80 / 100
+- AI Penalty Applied: Score set to 0 — pervasive CDRP detected without Transparency Report
+- Reflected Score: 0 / 100
+
+- Passing Threshold: 75% = 75 / 100
+- Result: FAIL
+- AI Label: AI Generated
+- CDRP Flags: 5
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 12/25 — Needs Improvement — [Bacos_Portfolio9.pdf: whole file — retained original instructions and rubric despite explicit instruction to remove them.]
+- AI Originality & Effort: 18/25 — Good — [Bacos_Portfolio9.pdf: Reflection — provides accurate but standard textbook definitions of the Avalanche Effect and the Golden Rule.]
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — [Bacos_Portfolio9.pdf: Part 2: Symmetric Encryption — correctly identifies SubBytes for confusion and MixColumns for diffusion.]
+- Case Study Application & Justification: 25/25 — Excellent — [Bacos_Portfolio9.pdf: Part 3: Hybrid Solution — accurately describes the use of ECDH to generate a shared secret for an AES session key.]
+- TOTAL: 80/100 — Math verified: 12+18+25+25 = 80
+===STUDENT FEEDBACK===
+You demonstrated a high level of technical accuracy in your evaluation of cryptographic algorithms, particularly in your explanation of AES operations like SubBytes and MixColumns in Part 2. Your design for the hybrid cryptographic handshake in Part 3 correctly identifies the collaboration between Elliptic Curve Diffie-Hellman for key exchange and AES for bulk encryption. These sections show you have a strong grasp of how different cryptographic primitives work together to secure a mobile banking environment.
+
+However, your submission failed to follow the formatting instructions provided in the activity, as you included the background scenario, instructions, and the grading rubric in your final document. For future submissions, ensure you remove all prompt text and headers as requested to maintain a professional report format. Additionally, your reflections on the Golden Rule and the Avalanche Effect would benefit from more specific examples tied to the Aegis Financial Network scenario rather than relying on general definitions.
+
+Your analysis of why MD5 is considered broken was clear and correctly identified the risk of collision attacks and pre-computed tables.
+
+Your analysis and written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include:
+""[The challenge is finding a balance between secure key exchange and fast data encryption.]""
+(Category D — the sentence uses a generic ""The challenge is X"" structure to summarize the preceding technical contrast between AES and RSA/ECC without introducing new case-specific details)
+""[This hybrid approach combines the strong key exchange capabilities of ECC with the speed and efficiency of AES.]""
+(Category E — the sentence functions as a portable technical verdict that summarizes the benefits of a hybrid system using only the names of the algorithms provided in the prompt)
+""[Using these proven libraries reduces the risk of implementation errors and improves overall system security.]""
+(Category E — this is a universal software engineering claim that remains valid in any context involving the use of third-party libraries versus custom code)
+""[This guarantees the integrity and authenticity of financial transaction records.]""
+(Category E — the sentence closes the section with a broad technical claim that does not depend on the specific mechanics of the Avalanche Effect described in the previous sentence)
+""[This upgraded hashing architecture greatly improves password security and resistance against brute-force attacks.]""
+(Category E — the sentence provides a high-level summary of security improvements that could apply to any system upgrade involving hashing)",success,AI Generated,5
+RON JHON KURT DIEGO,83.0,100,83.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+No CDRP candidates identified.
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 83 / 100
+- Reflected Score: 83 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Human Written
+- CDRP Flags: 0
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 20/25 — Good — Submission includes prompt headers (Objectives, Background) which should have been removed per instructions.
+- AI Originality & Effort: 25/25 — Excellent — Tone is highly informal and personalized, showing clear original thought and no AI boilerplate.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 18/25 — Good — Missed required technical details for AES (rounds, SubBytes, MixColumns) as specified in Part 2.
+- Case Study Application & Justification: 20/25 — Good — Correctly identifies strengths of ECC and AES but lacks the granular step-by-step detail for the hybrid handshake.
+- TOTAL: 83/100 — Math verified: 20+25+18+20 = 83
+===STUDENT FEEDBACK===
+You provided a very clear and accessible explanation for why ECC is superior to RSA for mobile banking, specifically highlighting the battery and processing benefits for smartphone users. Your analysis of the failure of MD5 correctly identifies the risk of collision attacks and the speed of rainbow tables in the Aegis Financial Network scenario. The reflection on the Avalanche Effect effectively demonstrates how small changes in transaction data become immediately visible to bank auditors.
+
+To improve your cryptographic accuracy, you should include the specific technical parameters requested in the prompt, such as the number of rounds in AES-256 and the specific functions of SubBytes and MixColumns in providing confusion and diffusion. For the hybrid handshake, try to outline the specific sequence of messages like the initial key exchange followed by the generation of the session key. Finally, ensure you remove the activity objectives and background headers from your final document to maintain a professional case study format as specified in the instructions.
+
+Your writing style is direct and shows a good grasp of how these abstract cryptographic concepts apply to real-world financial security problems. Keep focusing on these technical details to further strengthen your architectural recommendations.",success,Human Written,0
+ANDREE DAVE TEODORO,95.0,100,95.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""This guarantees integrity because even the smallest unauthorized change is mathematically guaranteed to produce a different hash, making tampering instantly detectable.""
+   CONTEXT: ""was tampered with. >> This guarantees integrity because even the smallest unauthorized change is mathematically guaranteed to produce a different hash, making tampering instantly detectable. << [end of file]""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 95 / 100
+- Reflected Score: 95 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Mostly Human
+- CDRP Flags: 1
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 20/25 — Good — [Submission contains Objectives, Background, and Instructions text despite prompt to ""Remove all headers""]
+- AI Originality & Effort: 25/25 — Excellent — [Reflection Answer 1: ""Standardized libraries like OpenSSL or libsodium are verified and are battle-tested""]
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — [Part 2 Answer 1: ""AES-256 uses a 256-bit key and undergoes 14 rounds of transformation""]
+- Case Study Application & Justification: 25/25 — Excellent — [Part 3 Answer 2: ""mobile app and AFN server use Elliptic Curve Diffie-Hellman (ECDH)... to securely agree on a temporary shared session key""]
+- TOTAL: 95/100 — Math verified: 20+25+25+25 = 95
+===STUDENT FEEDBACK===
+You demonstrated an excellent technical grasp of cryptographic transitions, particularly in your comparison of ECC P-256 and RSA-3072 security levels in Part 2. Your explanation of the hybrid handshake in Part 3 correctly identifies how ECDH facilitates secure key agreement over an open network before switching to AES for bulk data. The reflection on the Avalanche Effect in the context of financial document integrity shows a strong understanding of how hash sensitivity prevents tampering.
+
+To improve your future submissions, please ensure you strictly follow the ""Note"" section of the instructions regarding document cleanup. While your answers were perfectly structured, you included the entire activity background and instruction text which should have been removed prior to conversion to PDF. Consistently following these administrative constraints is a key part of professional technical reporting.
+
+Your analysis of the MD5 vulnerability and the mathematical necessity of salting and peppering was very well-articulated. Keep applying this level of detail to your case study justifications.
+
+Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include:
+""This guarantees integrity because even the smallest unauthorized change is mathematically guaranteed to produce a different hash, making tampering instantly detectable.""
+(Category E — the sentence employs a ""This guarantees X because Y makes Z"" structure that describes a universal property of hashing without referring back to the specific financial transaction context mentioned previously)",success,Mostly Human,1
+ZARETH DAVE BUCARILE,93.0,100,93.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+No CDRP candidates identified.
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 93 / 100
+- Reflected Score: 93 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Human Written
+- CDRP Flags: 0
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 18/25 — Good — Submission includes background and instructions; student failed to remove headers as per instructions.
+- AI Originality & Effort: 25/25 — Excellent — portfolio.txt: ""what the lecture calls"" — demonstrates active synthesis of course material.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — portfolio.txt: ""multiplicative inverse in GF(2⁸)"" — high technical precision in AES explanation.
+- Case Study Application & Justification: 25/25 — Excellent — portfolio.txt: ""Key Exchange using ECDHE"" — flawless step-by-step mapping of the hybrid handshake.
+- TOTAL: 93/100 — Math verified: 18+25+25+25 = 93
+
+===STUDENT FEEDBACK===
+You demonstrated an exceptional grasp of cryptographic mathematics, particularly in your explanation of the Advanced Encryption Standard. Your detailed breakdown of the SubBytes operation involving the multiplicative inverse in GF(2⁸) and the branch number of MixColumns shows university-level technical depth. Furthermore, your step-by-step formulation of the TLS 1.3 handshake correctly identifies the role of ephemeral keys (ECDHE) in establishing forward secrecy for the AFN mobile application.
+
+While your technical content is excellent, you failed to follow the specific formatting instruction to remove all headers, background text, and instructions from your final submission. For future portfolios, ensure you submit only your original analysis and answers to maintain a professional, clean document structure. Additionally, please ensure your file follows the required naming convention (Portfolio9_Bucarile) to assist in automated filing.
+
+Your work on the Avalanche Effect and the ""Golden Rule"" of cryptography shows a clear understanding of why standardized libraries are essential for financial security. Keep maintaining this level of technical rigor in your future case studies.",success,Human Written,0
+MARIZ NEPOMUCENO,60.0,100,60.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged phrase] << [3 words after]""):
+1. SENTENCE: ""Real cryptographic algorithms like AES, SHA-256, and ECC have been tested for years by global security researchers and have gone through extensive peer review, attacks, and improvements.""
+   CONTEXT: ""basic coding. >> Real cryptographic algorithms like AES, SHA-256, and ECC have been tested for years by global security researchers and have gone through extensive peer review, attacks, and improvements. << If AFN tries""
+2. SENTENCE: ""In summary, ECC-based key exchange ensures secure communication setup, while AES handles high-speed encryption of actual data.""
+   CONTEXT: ""banking users. >> In summary, ECC-based key exchange ensures secure communication setup, while AES handles high-speed encryption of actual data. << This hybrid approach""
+3. SENTENCE: ""The main dilemma between symmetric (AES) and asymmetric cryptography (RSA/ECC) is the trade-off between speed and secure key exchange.""
+   CONTEXT: ""Answer: a. >> The main dilemma between symmetric (AES) and asymmetric cryptography (RSA/ECC) is the trade-off between speed and secure key exchange. << Symmetric encryption like""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 78 / 100
+- Reflected Score: 60 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: FAIL
+- AI Label: Mostly AI
+- CDRP Flags: 3
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 15/25 — Needs Improvement — Submission includes the entire activity prompt (Objectives, Background, Instructions) despite the instruction to ""Remove all headers and rubric.""
+- AI Originality & Effort: 13/25 — Needs Improvement — Analysis relies heavily on formal, textbook-style definitions; contains 3 CDRP flags and lacks a Transparency Report.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — No Reference — domain knowledge applied. Part 1: SHA-256 + salt + pepper correctly explained; Part 2: AES-256 SubBytes (Confusion) and MixColumns (Diffusion) correctly identified.
+- Case Study Application & Justification: 25/25 — Excellent — No Reference — domain knowledge applied. Part 3: Step-by-step hybrid handshake (ECDH + AES) correctly formulated with clear performance justification for AFN's mobile app.
+- TOTAL: 78/100 — Math verified: 15+13+25+25 = 78
+
+===STUDENT FEEDBACK===
+You demonstrated a strong technical grasp of cryptographic operations, particularly in your explanation of the AES Substitution-Permutation Network and the specific roles of SubBytes and MixColumns. Your justification for transitioning to ECC to solve AFN’s battery drain and connection speed issues is highly compelling and directly addresses the case study's requirements. Furthermore, the step-by-step formulation of the hybrid handshake correctly identifies how ECDH and AES collaborate to provide both security and efficiency.
+
+Your submission failed to follow the formatting instructions to remove the activity headers, background, and instructions, which makes the document cluttered and difficult to navigate. While your technical accuracy is high, the writing style is overly formal and generic, lacking the personal synthesis required for the highest band in originality. To improve, ensure you strip all prompt text from your final PDF and try to explain complex concepts using your own analogies rather than textbook definitions. You must also include a Transparency Report if you utilize AI tools to assist with your drafting or research.
+
+Great job on the technical accuracy of your algorithm evaluations. Focus on refining your document formatting and developing your personal analytical voice in future portfolios.
+
+Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include:
+- ""Real cryptographic algorithms like AES, SHA-256, and ECC have been tested for years by global security researchers and have gone through extensive peer review, attacks, and improvements."" (Category E — the sentence provides a generalized endorsement of standardized libraries that does not reference AFN's specific developers or the banking scenario, making it portable to any security essay)
+- ""In summary, ECC-based key exchange ensures secure communication setup, while AES handles high-speed encryption of actual data."" (Category E — this summarizes a hybrid handshake using generic functional labels that remain valid for any TLS-based implementation regardless of the application)
+- ""The main dilemma between symmetric (AES) and asymmetric cryptography (RSA/ECC) is the trade-off between speed and secure key exchange."" (Category B — this contrast between speed and key sharing is a textbook definition that does not incorporate AFN's specific mobile banking context)
+
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly AI,3
+ALIANDRY SUMABAT,100.0,100,100.00%,"<AI_DETECTION_EVIDENCE_LOG>
+PURPOSE: Raw extraction only. No evaluation. No scoring. No CDRP judgment.
+CANDIDATE PHRASES (format: SENTENCE: ""[full sentence as it appears in submission]""
+                           CONTEXT: ""[3 words before flagged phrase] >> [flagged sentence] << [3 words after]""):
+1. SENTENCE: ""Reinventing the wheel here is not just inefficient; it’s dangerous.""
+   CONTEXT: ""continuously updated. >> Reinventing the wheel here is not just inefficient; it’s dangerous. << [end]""
+</AI_DETECTION_EVIDENCE_LOG>
+
+===GRADE BREAKDOWN===
+- Rubric Score: 100 / 100
+- Reflected Score: 100 / 100
+- Passing Threshold: 75% = 75 / 100
+- Result: PASS
+- AI Label: Mostly Human
+- CDRP Flags: 1
+- Transparency Report: Not present
+CRITERIA:
+- Following Instructions & Formatting: 25/25 — Excellent — Portfolio #9: Cryptography Case Study: all required parts (1, 2, 3, and Reflection) are present and correctly labeled.
+- AI Originality & Effort: 25/25 — Excellent — Reflection: provides specific synthesis of the Avalanche Effect applied to financial transaction integrity.
+- Cryptographic Accuracy (Hashing & Cipher Eval): 25/25 — Excellent — Part 2: correctly identifies 14 rounds for AES-256 and distinguishes between SubBytes (confusion) and MixColumns (diffusion).
+- Case Study Application & Justification: 25/25 — Excellent — Part 3: provides a technically accurate 5-step hybrid handshake utilizing ECDH for key exchange and AES for bulk encryption.
+- TOTAL: 100/100 — Math verified: 25+25+25+25 = 100
+
+===STUDENT FEEDBACK===
+Your analysis of the MD5 vulnerability in Part 1 is technically sound, correctly identifying how the small output space allowed for the use of pre-computed Rainbow Tables to compromise the AFN database. The step-by-step breakdown of the TLS 1.3-style handshake in Part 3 effectively demonstrates how ECC and AES-256 collaborate to secure the mobile banking environment while addressing the battery drain issues mentioned in the scenario. Your reflection on the Avalanche Effect successfully connects mathematical properties to the practical necessity of transaction integrity in digital banking.
+
+While your explanation of the Avalanche Effect in the Reflection section is accurate, you could further strengthen the response by providing a hypothetical example of a specific transaction field, such as a decimal point shift in a currency value, to illustrate the drastic change in the resulting hash. For the AES section in Part 2, explicitly mentioning that AES is a block cipher would provide additional technical clarity to your comparison with the legacy DES structure. Ensure that your future submissions strictly follow the file naming convention ""Portfolio9_Sumabat"" to maintain full compliance with administrative requirements.
+
+Your work shows a high level of technical proficiency and a clear understanding of how cryptographic choices impact both security and user experience in a mobile-first banking environment.
+
+Your written response contains language patterns consistent with contextually detached rhetorical polish — phrasing that is well-constructed but does not depend on the specific details of this submission to make its point. Specific indicators include: 
+
+""Reinventing the wheel here is not just inefficient; it’s dangerous.""
+(Category A — the ""not just X, it's Y"" construction functions as a portable moral maxim that remains valid regardless of the specific technical project or case study being discussed)
+
+Academic integrity at CvSU requires that submitted work represent your own thinking and expression. Please review the University Academic Integrity Policy.",success,Mostly Human,1

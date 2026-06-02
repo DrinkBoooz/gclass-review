@@ -33,6 +33,7 @@ OAuth Setup:
 from __future__ import annotations  # enables list[dict] syntax on Python 3.8/3.9
 
 import csv
+import json
 import logging
 import os
 import re
@@ -204,6 +205,14 @@ def get_turned_in_submissions(service, course_id: str, coursework_id: str) -> li
     submissions = []
     page_token = None
 
+    def _needs_full_submission(submission: dict) -> bool:
+        assignment_submission = submission.get("assignmentSubmission")
+        if assignment_submission is None or assignment_submission == {}:
+            return True
+        if "attachments" not in assignment_submission:
+            return True
+        return False
+
     while True:
         response = (
             service.courses()
@@ -214,6 +223,7 @@ def get_turned_in_submissions(service, course_id: str, coursework_id: str) -> li
                 courseWorkId=coursework_id,
                 states=["TURNED_IN"],
                 pageToken=page_token,
+                fields="*"
             )
             .execute()
         )
@@ -221,6 +231,36 @@ def get_turned_in_submissions(service, course_id: str, coursework_id: str) -> li
         # all other status codes surface immediately to the caller.
 
         page_submissions = response.get("studentSubmissions", [])
+
+        # Some list responses omit assignmentSubmission data even when requested.
+        # If that happens, fetch the full submission via a get() call.
+        for index, submission in enumerate(page_submissions):
+            if not _needs_full_submission(submission):
+                continue
+            submission_id = submission.get("id")
+            if not submission_id:
+                continue
+            try:
+                full_submission = (
+                    service.courses()
+                    .courseWork()
+                    .studentSubmissions()
+                    .get(
+                        courseId=course_id,
+                        courseWorkId=coursework_id,
+                        id=submission_id,
+                        fields="*"
+                    )
+                    .execute()
+                )
+                page_submissions[index] = full_submission
+            except HttpError as e:
+                logger.warning(
+                    "  Failed to refetch submission %s for full data: %s",
+                    submission_id,
+                    e,
+                )
+
         submissions.extend(page_submissions)
         logger.info("  Fetched %d submission(s) so far...", len(submissions))
 
@@ -318,11 +358,16 @@ def extract_attachment_content(attachment: dict, drive_service) -> tuple[Optiona
                         reader = pypdf.PdfReader(BytesIO(content_bytes))
                         pages = [page.extract_text() or "" for page in reader.pages]
                         text = "\n\n".join(pages).strip()
+                        image_count = _count_pdf_images(content_bytes)
                         if not text:
                             ocr_text = _ocr_pdf_bytes(content_bytes)
                             if ocr_text:
+                                if image_count:
+                                    ocr_text = f"{ocr_text}\n\n[Embedded images detected: {image_count}]"
                                 return ocr_text, "application/pdf"
                             return "[PDF contains no extractable text (scanned/image-based)]", "application/pdf"
+                        if image_count:
+                            text = f"{text}\n\n[Embedded images detected: {image_count}]"
                         return text, "application/pdf"
                     except Exception as e:
                         return f"[PDF read error: {e}]", "application/pdf"
@@ -338,10 +383,17 @@ def extract_attachment_content(attachment: dict, drive_service) -> tuple[Optiona
                         )
                     try:
                         document = docx.Document(BytesIO(content_bytes))
+                        image_count = 0
+                        try:
+                            image_count = len(document.inline_shapes)
+                        except Exception:
+                            image_count = 0
                         full_text = [para.text for para in document.paragraphs]
                         text = "\n".join(full_text).strip()
                         if not text:
                             return (f"[DOCX contains no extractable text: {file_title}]", mime_type)
+                        if image_count:
+                            text = f"{text}\n\n[Embedded images detected: {image_count}]"
                         return text, mime_type
                     except Exception as e:
                         return (f"[DOCX read error: {e}]", mime_type)
@@ -391,15 +443,32 @@ def collect_submission_content(submission: dict, drive_service) -> str:
     """
     assignment_submission = submission.get("assignmentSubmission", {})
     attachments = assignment_submission.get("attachments", [])
-
-    if not attachments:
-        logger.warning(
-            "  Submission ID=%s has no attachments.", submission.get("id")
-        )
-        return {"text": "", "binary_parts": []}
+    short_answer = submission.get("shortAnswerSubmission", {})
+    multiple_choice = submission.get("multipleChoiceSubmission", {})
 
     text_parts: list[str] = []
     binary_parts: list[tuple[bytes, str]] = []
+    image_attachments: list[str] = []
+
+    short_answer_text = (short_answer or {}).get("answer")
+    if isinstance(short_answer_text, str) and short_answer_text.strip():
+        text_parts.append(short_answer_text.strip())
+
+    multiple_choice_answer = (multiple_choice or {}).get("answer")
+    if isinstance(multiple_choice_answer, str) and multiple_choice_answer.strip():
+        text_parts.append(multiple_choice_answer.strip())
+
+    if not attachments and not text_parts:
+        logger.warning(
+            "  Submission ID=%s has no attachments. Raw assignmentSubmission keys: %s",
+            submission.get("id"),
+            list(assignment_submission.keys()) or "(empty — API returning partial response)",
+        )
+        snapshot = json.dumps(submission, default=str, ensure_ascii=True)
+        if len(snapshot) > 4000:
+            snapshot = f"{snapshot[:4000]}... [truncated]"
+        logger.warning("  Submission snapshot: %s", snapshot)
+        return {"text": "", "binary_parts": []}
 
     for i, attachment in enumerate(attachments, start=1):
         logger.info("  Processing attachment %d/%d...", i, len(attachments))
@@ -408,13 +477,22 @@ def collect_submission_content(submission: dict, drive_service) -> str:
             continue
 
         if isinstance(content, bytes):
-            binary_parts.append((content, mime or "application/octet-stream"))
+            resolved_mime = mime or "application/octet-stream"
+            if resolved_mime.startswith("image/"):
+                image_attachments.append(f"attachment_{i}{Path(resolved_mime).suffix}")
+            binary_parts.append((content, resolved_mime))
         else:
             # content is text
             text_parts.append(str(content))
+            if (mime or "").startswith("image/"):
+                image_attachments.append(f"attachment_{i}{Path(mime).suffix}")
 
     if not text_parts and not binary_parts:
         return {"text": "", "binary_parts": []}
+
+    if image_attachments:
+        image_list = ", ".join(image_attachments)
+        text_parts.insert(0, f"[Attachments: {len(image_attachments)} image(s) — {image_list}]")
 
     return {"text": "\n\n".join(text_parts), "binary_parts": binary_parts}
 
@@ -467,6 +545,32 @@ def _ocr_pdf_bytes(content_bytes: bytes) -> str:
             logger.warning("OCR page failed: %s", e)
 
     return "\n\n".join([t.strip() for t in ocr_pages if t.strip()])
+
+
+def _count_pdf_images(content_bytes: bytes) -> int:
+    try:
+        reader = pypdf.PdfReader(BytesIO(content_bytes))
+    except Exception:
+        return 0
+
+    count = 0
+    for page in reader.pages:
+        try:
+            resources = page.get("/Resources") or {}
+            xobject = resources.get("/XObject")
+            if not xobject:
+                continue
+            xobject = xobject.get_object()
+            for obj in xobject.values():
+                try:
+                    obj = obj.get_object()
+                    if obj.get("/Subtype") == "/Image":
+                        count += 1
+                except Exception:
+                    continue
+        except Exception:
+            continue
+    return count
 
 
 # ---------------------------------------------------------------------------
@@ -545,41 +649,38 @@ def _safe_filename(label: str) -> str:
 
 
 
+
 def save_feedback_to_csv(
     results: list[dict],
     output_dir: str = ".",
     coursework_title: str = "",
 ) -> str:
     """
-    Saves all grading results and AI feedback to a timestamped CSV file.
+    Saves all grading results to a timestamped CSV file.
 
-    This is the primary mechanism for delivering per-student feedback, since
-    the Classroom REST API does not support posting private comments.
+    Schema matches gradeflowai.com output format with one addition:
+    CDRP Flags replaces the numeric AI Score percentage — derived from the
+    CEIT Faculty Operational Protocol (Dan's AI Detection Guide) which
+    explicitly rejects numeric percentages as statistically unreliable.
 
-    The instructor can use this CSV to:
-      - Copy-paste feedback into Classroom's private comment box per student
-      - Mail-merge feedback directly to students via email
-      - Keep a local grading record for auditing
+    Columns:
+        Student Name, Score, Max Score, Percentage,
+        Feedback, Status, AI Detection, CDRP Flags
 
-    CSV columns (core):
-        Student Name, Score, Rubric Score, Max Score, Percentage, Result,
-        AI Detection, CDRP Flags, Transparency Report, Feedback, Status
-
-    Per-criterion columns are appended dynamically based on the criteria list
-    returned by the grader — one column per criterion in the format
-    "[Criterion Name] Score", "[Criterion Name] Level", "[Criterion Name] Evidence".
-    This means the column count adapts automatically to any rubric.
+    Feedback column contains ONLY the ===STUDENT FEEDBACK=== prose extracted
+    from the model output — not the full grade breakdown. The full model
+    output is preserved in result["raw_output"] for audit purposes.
 
     Args:
-        results:    List of result dicts accumulated during the pipeline run.
-        output_dir: Directory where the CSV will be written. Defaults to CWD.
+        results:          List of result dicts from the pipeline run.
+        output_dir:       Directory where the CSV will be written.
         coursework_title: Used for the output filename when provided.
 
     Returns:
-        The full path to the written CSV file.
+        Full path to the written CSV file.
 
     Raises:
-        RuntimeError: If the CSV cannot be written (disk full, bad path, etc.).
+        RuntimeError: If the CSV cannot be written.
     """
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     if coursework_title:
@@ -589,65 +690,38 @@ def save_feedback_to_csv(
         filename = f"grading_results_{timestamp}.csv"
     filepath = os.path.join(output_dir, filename)
 
-    # ── AI label derived from CDRP flags + Transparency Report ───────────────
-    # Based on CEIT Faculty Operational Protocol (Dan's AI Detection Guide).
-    # Numeric percentages are rejected by the guide (Section 3) as unreliable.
+    # ── AI label derived from CDRP flag count + Transparency Report ──────────
+    # Mirrors _apply_penalty_tiers in gemini_grader.py exactly.
+    # Tiers:
+    #   Any flags + valid TR  → Human Written (disclosed; full score)
+    #   0 flags               → Human Written
+    #   1–2 flags, no TR      → Mostly Human  (warning only, no score change)
+    #   3–4 flags, no TR      → Mostly AI     (score capped at 60, oral defense)
+    #   5+ flags,  no TR      → AI Generated  (score set to 0, oral defense)
     def _ai_label(flag_count: Optional[int], tr_status: str) -> str:
-        """
-        Rules (matching the guide's Section 5 Human-in-the-Loop flow):
-          - Valid Transparency Report always clears to Human Written regardless
-            of flag count — student disclosed and explained their use.
-          - 0 flags → Human Written  (no structural AI markers found)
-          - 1 flag  → Mostly Human   (one weak signal; borderline)
-          - 2–3 flags → Mostly AI    (pattern is consistent across submission)
-          - 4+  flags → AI Generated (pervasive CDRP throughout)
-        """
-        if tr_status == "Present and reflective":
+        tr_valid = (tr_status or "").strip().lower() == "present and reflective"
+        if tr_valid:
             return "Human Written"
         if flag_count is None:
             return ""
         if flag_count == 0:
             return "Human Written"
-        if flag_count == 1:
+        if flag_count <= 2:
             return "Mostly Human"
-        if flag_count <= 3:
+        if flag_count <= 4:
             return "Mostly AI"
         return "AI Generated"
 
-    # ── Discover all criterion names across all results ───────────────────────
-    # Criteria names are collected in insertion order so the column layout is
-    # consistent even if different submissions have slightly different ordering.
-    seen_criteria: list[str] = []
-    for r in results:
-        for c in r.get("criteria", []):
-            name = c.get("name", "")
-            if name and name not in seen_criteria:
-                seen_criteria.append(name)
-
-    # ── Build fieldnames ──────────────────────────────────────────────────────
-    core_fields = [
+    fieldnames = [
         "Student Name",
-        "Score",           # reflected_score (after any AI penalty)
-        "Rubric Score",    # rubric_score (before penalty) — for instructor review
+        "Score",
         "Max Score",
         "Percentage",
-        "Result",          # PASS / FAIL based on 75% threshold
-        "AI Detection",
-        "CDRP Flags",
-        "Transparency Report",
-        "Math Verified",
         "Feedback",
         "Status",
+        "AI Detection",
+        "CDRP Flags",   # Our differentiator — integer count, not a percentage
     ]
-    # Append one triplet of columns per criterion in rubric order
-    criterion_fields = []
-    for name in seen_criteria:
-        criterion_fields += [
-            f"{name} — Score",
-            f"{name} — Level",
-            f"{name} — Evidence",
-        ]
-    fieldnames = core_fields + criterion_fields
 
     try:
         with open(filepath, "w", newline="", encoding="utf-8") as f:
@@ -655,9 +729,8 @@ def save_feedback_to_csv(
             writer.writeheader()
 
             for r in results:
-                score        = r.get("score", "")          # reflected_score
-                rubric_score = r.get("rubric_score", score) # before penalty
-                max_s        = r.get("max_score", "")
+                score = r.get("score", "")
+                max_s = r.get("max_score", "")
 
                 flag_count = r.get("cdrp_flag_count")
                 flag_count_int = None
@@ -668,45 +741,26 @@ def save_feedback_to_csv(
 
                 tr_status = r.get("transparency_report", "")
 
-                pct = (
-                    f"{(score / max_s * 100):.1f}%"
-                    if isinstance(score, int) and max_s
-                    else ""
-                )
+                # Support both int and float scores (e.g. 93.3 / 100)
+                try:
+                    pct = (
+                        f"{(float(score) / float(max_s) * 100):.2f}%"
+                        if score != "" and max_s
+                        else ""
+                    )
+                except (TypeError, ZeroDivisionError):
+                    pct = ""
 
-                # PASS/FAIL at 75% threshold (Philippine HE standard)
-                if isinstance(score, int) and max_s:
-                    result_label = "PASS" if (score / max_s) >= 0.75 else "FAIL"
-                else:
-                    result_label = ""
-
-                row = {
-                    "Student Name":      r.get("name", ""),
-                    "Score":             score,
-                    "Rubric Score":      rubric_score,
-                    "Max Score":         max_s,
-                    "Percentage":        pct,
-                    "Result":            result_label,
-                    "AI Detection":      _ai_label(flag_count_int, tr_status),
-                    "CDRP Flags":        flag_count_int if flag_count_int is not None else "",
-                    "Transparency Report": tr_status,
-                    "Math Verified":     r.get("math_verified", ""),
-                    "Feedback":          r.get("feedback", ""),
-                    "Status":            r.get("status", ""),
-                }
-
-                # Index this submission's criteria by name for fast lookup
-                criteria_by_name = {
-                    c.get("name", ""): c
-                    for c in r.get("criteria", [])
-                }
-                for name in seen_criteria:
-                    c = criteria_by_name.get(name, {})
-                    row[f"{name} — Score"]    = c.get("score", "") if c else ""
-                    row[f"{name} — Level"]    = c.get("level", "") if c else ""
-                    row[f"{name} — Evidence"] = c.get("evidence", "") if c else ""
-
-                writer.writerow(row)
+                writer.writerow({
+                    "Student Name": r.get("name", ""),
+                    "Score":        score,
+                    "Max Score":    max_s,
+                    "Percentage":   pct,
+                    "Feedback":     r.get("feedback", ""),
+                    "Status":       r.get("status", ""),
+                    "AI Detection": _ai_label(flag_count_int, tr_status),
+                    "CDRP Flags":   flag_count_int if flag_count_int is not None else "",
+                })
 
     except OSError as e:
         raise RuntimeError(

@@ -1,8 +1,8 @@
-import json
 import logging
 import os
+import re
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 import pypdf
 from google import genai
@@ -17,51 +17,22 @@ logger = logging.getLogger(__name__)
 
 # Resolve model once at import time so build_cached_prefix and grade_submission
 # always reference the same model string — a mismatch causes a 400 from the API.
-MODEL = os.getenv("GEMINI_MODEL") or os.getenv("AI_MODEL") or "gemini-3.5-flash"
+MODEL = os.getenv("GEMINI_MODEL") or os.getenv("AI_MODEL") or "gemini-3-flash-preview"
 
 
 def _is_gemini_model(model: str) -> bool:
     """
     Returns True only for models served by Google's Gemini API.
-    Local Ollama models (e.g. llama3.1:8b), custom endpoints, and any
-    non-gemini string must return False so caching and search grounding
-    are skipped — those features only exist on Google's infrastructure.
+    Local Ollama models (e.g. llama3.1:8b) must return False so caching and
+    search grounding are skipped — those features only exist on Google infra.
     """
     name = model.lower().strip()
-    if ":" in name:          # Ollama-style names always contain a colon (model:tag)
+    if ":" in name:   # Ollama-style names always contain a colon (model:tag)
         return False
     return name.startswith("gemini")
 
 
 DEFAULT_SYSTEM_PROMPT = "You are a rigorous academic grader. Follow the rubric exactly."
-
-# ---------------------------------------------------------------------------
-# Output schema for the structured grading result.
-# Passed as response_schema so the model is constrained to this shape.
-#
-# CriterionScore captures the per-criterion breakdown the rubric defines.
-# GradeResult wraps the full grading output including that breakdown.
-# ---------------------------------------------------------------------------
-from pydantic import BaseModel
-
-
-class CriterionScore(BaseModel):
-    name: str         # Criterion name exactly as it appears in the rubric
-    score: int        # Points awarded for this criterion
-    max_score: int    # Maximum points for this criterion
-    level: str        # Exact level label from the rubric (e.g. "Excellent", "Good")
-    evidence: str     # Specific evidence: file + field + value found in submission
-
-
-class GradeResult(BaseModel):
-    rubric_score: int          # Sum of all criterion scores before any AI penalty
-    reflected_score: int       # Score after AI penalty applied (same as rubric_score if no penalty)
-    feedback: str              # Full student-facing feedback (markdown)
-    ai_likelihood: str         # "Low" | "Med" | "High"
-    cdrp_flag_count: int       # Number of phrases that passed all 3 CDRP steps (0–N)
-    transparency_report: str   # "Present and reflective" | "Present but not reflective" | "Not present"
-    criteria: List[CriterionScore]   # One entry per rubric criterion
-    math_verified: str         # e.g. "25+20+18+25 = 88" — confirms criterion scores sum correctly
 
 
 # ---------------------------------------------------------------------------
@@ -84,6 +55,16 @@ def _read_docx_text(path: Path) -> str:
         return ""
     document = docx.Document(str(path))
     paragraphs = [p.text.strip() for p in document.paragraphs if p.text.strip()]
+    table_lines: list[str] = []
+    for table in document.tables:
+        for row in table.rows:
+            cells = [c.text.strip() for c in row.cells]
+            cells = [c for c in cells if c]
+            if cells:
+                table_lines.append(" | ".join(cells))
+
+    if table_lines:
+        return "\n".join(paragraphs + [""] + table_lines)
     return "\n".join(paragraphs)
 
 
@@ -128,22 +109,21 @@ def build_cached_prefix(
 ) -> str:
     """
     Creates an explicit CachedContent object containing the rubric and system
-    prompt. All per-student calls that receive the returned name skip re-sending
+    prompt. Per-student calls that receive the returned name skip re-sending
     those tokens, cutting prompt cost for large batches.
 
-    Returns "" (and skips the API call entirely) when:
+    Returns "" when:
       - No rubric is provided
-      - MODEL is a local/non-Gemini model (e.g. llama3.1:8b via Ollama)
-        because Google's caching API only supports Gemini models.
-    Falls back gracefully on any other API error so callers use full prompts.
+      - MODEL is a local/non-Gemini model (Ollama etc.) — caching API is
+        Google-only.
+    Falls back gracefully on any API error.
     """
     if not rubric:
         return ""
 
     if not _is_gemini_model(MODEL):
         logger.info(
-            "Skipping explicit cache — model '%s' is not a Gemini API model "
-            "(local/Ollama models don't support createCachedContent).", MODEL
+            "Skipping explicit cache — model '%s' is not a Gemini API model.", MODEL
         )
         return ""
 
@@ -162,10 +142,9 @@ def build_cached_prefix(
         logger.info("Cached prefix created: %s", cached.name)
         return cached.name or ""
     except Exception as e:
-        # Surface as error so operators know caching is off for this run.
         logger.error(
             "Cached prefix not created — falling back to full prompts "
-            "(all students in this run pay full rubric token cost): %s", e
+            "(all students pay full rubric token cost): %s", e
         )
         return ""
 
@@ -179,41 +158,177 @@ def _build_search_tool() -> types.Tool:
     return types.Tool(google_search=types.GoogleSearch())
 
 
-def _extract_json(raw: str) -> dict:
-    """
-    Pull the first complete JSON object from raw text.
-    Gemini with google_search active returns prose around the JSON;
-    this handles that gracefully.
-    """
-    start = raw.find("{")
-    end = raw.rfind("}") + 1
-    if start == -1 or end == 0:
-        raise ValueError(f"No JSON object found in response: {raw[:200]!r}")
-    return json.loads(raw[start:end])
+# ---------------------------------------------------------------------------
+# Output parser
+# ---------------------------------------------------------------------------
 
+def _count_cdrp_flags(raw: str) -> int:
+    """
+    Count CONFIRMED CDRP flags — not raw Pass 1 candidates.
 
-def _fields_description(max_score: int) -> str:
+    The gradewithai prompt runs a two-pass process:
+      Pass 1 — extracts candidates into <AI_DETECTION_EVIDENCE_LOG>
+      Pass 2 — runs CDRP Steps 1-3 on each candidate; only phrases that
+               survive all three steps appear as FLAG FORMAT entries in the
+               AI Usage Notice inside ===STUDENT FEEDBACK===
+
+    A raw candidate that fails any CDRP step is dropped and must NOT be
+    counted. Counting evidence log entries inflates the flag count because
+    most candidates are legitimately rejected after adversarial challenge.
+
+    Counting strategy (in priority order):
+      1. Count (Category X —) FLAG FORMAT entries in the AI Usage Notice.
+         These are the only phrases that passed all three CDRP steps.
+      2. If the AI Usage Notice template is present but has zero Category
+         entries (malformed — model wrote the notice but omitted flag blocks),
+         treat as 1 confirmed flag so the warning tier still fires.
+      3. If no AI Usage Notice at all → 0 confirmed flags.
     """
-    Shared JSON field description injected into every grading prompt so the
-    model always knows the exact shape required by GradeResult.
-    """
-    return (
-        f"Return ONLY a JSON object with these exact fields:\n"
-        f"  rubric_score (int, 0–{max_score}) — sum of all criterion scores before AI penalty\n"
-        f"  reflected_score (int, 0–{max_score}) — after AI penalty; same as rubric_score if no penalty\n"
-        f"  feedback (string, markdown) — full student-facing feedback\n"
-        f"  ai_likelihood (string, one of: Low / Med / High)\n"
-        f"  cdrp_flag_count (int) — number of phrases that passed all 3 CDRP steps\n"
-        f"  transparency_report (string, one of: "
-        f"'Present and reflective' | 'Present but not reflective' | 'Not present')\n"
-        f"  criteria (array) — one object per rubric criterion, each with:\n"
-        f"    name (string) — criterion name exactly as in the rubric\n"
-        f"    score (int) — points awarded\n"
-        f"    max_score (int) — maximum points for this criterion\n"
-        f"    level (string) — exact level label from the rubric\n"
-        f"    evidence (string) — specific evidence: file + field + value found\n"
-        f"  math_verified (string) — e.g. '25+20+18+25 = 88'"
+    # Extract student feedback section (everything after ===STUDENT FEEDBACK===)
+    feedback_split = re.split(r"={3,}STUDENT FEEDBACK={3,}", raw, maxsplit=1)
+    student_section = feedback_split[1] if len(feedback_split) == 2 else raw
+
+    # Check if AI Usage Notice is present (notice template anchor phrase)
+    notice_present = bool(re.search(
+        r"contextually detached rhetorical polish", student_section, re.IGNORECASE
+    ))
+
+    if not notice_present:
+        return 0
+
+    # Count FLAG FORMAT entries: "(Category A —" / "(Category B –" etc.
+    confirmed = re.findall(
+        r"\(Category\s+[A-E]\s*[—–\-]", student_section, re.IGNORECASE
     )
+    if confirmed:
+        return len(confirmed)
+
+    # Notice present but flag entries missing (malformed output) — treat as 1
+    return 1
+
+
+def _apply_penalty_tiers(rubric_score: float, cdrp_flags: int,
+                          tr_status: str, max_score: int) -> float:
+    """
+    Apply the CEIT Faculty Operational Protocol penalty tiers.
+    This overrides whatever penalty (or lack thereof) the model applied
+    based on its own AI Score percentage.
+
+    Tiers (as specified):
+      Any flags + valid TR                → full rubric score, no penalty
+      0 flags, no TR                      → full rubric score, no penalty
+      1–2 flags, no TR                    → full rubric score, warning only
+      3–4 flags, no TR                    → score capped at 60, oral defense notice
+      5+ flags,  no TR                    → score set to 0, oral defense notice
+    """
+    tr_valid = tr_status.strip().lower() == "present and reflective"
+
+    if tr_valid or cdrp_flags <= 2:
+        return rubric_score                              # no penalty
+    if cdrp_flags <= 4:
+        return min(rubric_score, 60.0)                  # cap at 60
+    return 0.0                                          # zero
+
+
+def _parse_model_output(raw: str, max_score: int) -> dict:
+    """
+    Parse the model's free-form structured text output into a result dict.
+
+    Uses the gradewithai prompt output format:
+        <AI_DETECTION_EVIDENCE_LOG> ... </AI_DETECTION_EVIDENCE_LOG>
+        ===GRADE BREAKDOWN===
+        - Total Score: X / Y            (FORMAT A — no model penalty)
+        - Rubric Score (before ...): X  (FORMAT B/C — model applied penalty)
+        - Reflected Score: X / Y        (FORMAT B/C)
+        - AI Score: N%
+        - Transparency Report: ...
+        CRITERIA: ...
+        ===STUDENT FEEDBACK===
+
+    Key design decisions:
+      - CDRP flag count is counted from the evidence log, NOT from a field
+        the gradewithai prompt never writes.
+      - Rubric score is always extracted as the pre-penalty score so our
+        own tier logic can recompute the final score independently.
+      - The model's own penalty decision (FORMAT B/C based on AI Score %)
+        is IGNORED — our tier logic overwrites it.
+      - feedback = full raw output (gradewithai behaviour — instructor sees all).
+    """
+    result: dict = {
+        "score": 0.0,
+        "rubric_score": 0.0,
+        "cdrp_flag_count": 0,
+        "ai_score_pct": "",
+        "transparency_report": "Not present",
+        "feedback": raw.strip(),
+        "raw_output": raw.strip(),
+        "penalty_tier": "none",   # for logging: none | warning | cap60 | zero
+    }
+
+    # ── Step 1: Count confirmed CDRP flags from AI Usage Notice ─────────────
+    # Uses confirmed Category A–E entries in the notice, NOT raw evidence log
+    # candidates — candidates that fail Steps 1–3 must not be counted.
+    result["cdrp_flag_count"] = _count_cdrp_flags(raw)
+
+    # ── Step 2: Extract Transparency Report status ───────────────────────────
+    tr_match = re.search(
+        r"-\s*Transparency Report\s*:\s*(.+?)(?:\n|$)", raw, re.IGNORECASE
+    )
+    if tr_match:
+        result["transparency_report"] = tr_match.group(1).strip()
+
+    # ── Step 3: Extract the rubric (pre-penalty) score ───────────────────────
+    # Always use Rubric Score line if present — it's the pre-penalty score
+    # regardless of whether the model applied FORMAT B or C.
+    # Fall back to Total Score (FORMAT A — no penalty was applied).
+    rubric_match = re.search(
+        r"-\s*Rubric Score[^:\n]*:\s*(\d+(?:\.\d+)?)\s*/\s*\d+", raw, re.IGNORECASE
+    )
+    total_match = re.search(
+        r"-\s*Total Score\s*:\s*(\d+(?:\.\d+)?)\s*/\s*\d+", raw, re.IGNORECASE
+    )
+
+    if rubric_match:
+        rubric_score = float(rubric_match.group(1))
+    elif total_match:
+        rubric_score = float(total_match.group(1))
+    else:
+        # Last resort: try Reflected Score (shouldn't happen but be safe)
+        reflected_match = re.search(
+            r"-\s*Reflected Score\s*:\s*(\d+(?:\.\d+)?)\s*/\s*\d+", raw, re.IGNORECASE
+        )
+        rubric_score = float(reflected_match.group(1)) if reflected_match else 0.0
+
+    rubric_score = max(0.0, min(rubric_score, float(max_score)))
+    result["rubric_score"] = rubric_score
+
+    # ── Step 4: Apply our penalty tiers ─────────────────────────────────────
+    # This overwrites the model's own FORMAT B/C decision entirely.
+    final_score = _apply_penalty_tiers(
+        rubric_score=rubric_score,
+        cdrp_flags=result["cdrp_flag_count"],
+        tr_status=result["transparency_report"],
+        max_score=max_score,
+    )
+    result["score"] = final_score
+
+    # Record which tier fired for logging
+    flags = result["cdrp_flag_count"]
+    tr_valid = result["transparency_report"].strip().lower() == "present and reflective"
+    if tr_valid or flags <= 2:
+        result["penalty_tier"] = "none" if flags == 0 else ("none_tr" if tr_valid else "warning")
+    elif flags <= 4:
+        result["penalty_tier"] = "cap60"
+    else:
+        result["penalty_tier"] = "zero"
+
+    # ── Step 5: Extract AI Score percentage (reference only) ────────────────
+    ai_match = re.search(r"-\s*AI Score\s*:\s*(\d+(?:\.\d+)?%?)", raw, re.IGNORECASE)
+    if ai_match:
+        val = ai_match.group(1).strip()
+        result["ai_score_pct"] = val if "%" in val else f"{val}%"
+
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -230,19 +345,19 @@ def _grade_with_search(
     thinking_level: str,
 ) -> tuple[Optional[dict], Optional[object]]:
     """
-    Grounded grading call with Google Search enabled.
+    Free-form grading call with Google Search grounding enabled.
 
-    Tries response_schema=GradeResult + search first (compatible on gemini-3.5-flash
-    per the Gemini 3 structured-output update). If the API rejects the combination
-    (older model behaviour), retries without response_schema and parses prose JSON.
+    No response_schema — the model writes the structured text output defined
+    in activity-checker-v4-fixed.md. _parse_model_output() extracts the
+    fields afterwards. This prevents schema-forced hallucination where the
+    model invents evidence to fill required JSON fields.
     """
     grading_prompt = (
-        f"Grade the following student submission strictly against the rubric. "
-        f"You may use Google Search to verify factual claims or look up domain knowledge "
-        f"that helps you apply the rubric more accurately.\n\n"
+        f"Grade the following student submission strictly against the rubric.\n"
+        f"You may use Google Search to verify factual claims or look up domain "
+        f"knowledge that helps you apply the rubric more accurately.\n\n"
         f"STUDENT NAME: {student_name}\n"
-        f"SUBMISSION:\n{text}\n\n"
-        + _fields_description(max_score)
+        f"SUBMISSION:\n{text}"
     )
 
     contents = [
@@ -252,80 +367,47 @@ def _grade_with_search(
         )
     ]
 
-    for use_schema in (True, False):
-        try:
-            config_kwargs = dict(
-                system_instruction=f"{system_prompt}\n\nRUBRIC:\n{rubric}",
-                tools=[_build_search_tool()],
-                temperature=0.6,
-                thinking_config=ThinkingConfig(thinking_level=thinking_level),
-            )
-            if use_schema:
-                config_kwargs["response_mime_type"] = "application/json"
-                config_kwargs["response_schema"] = GradeResult
+    try:
+        config = GenerateContentConfig(
+            system_instruction=f"{system_prompt}\n\nRUBRIC:\n{rubric}",
+            tools=[_build_search_tool()],
+            temperature=0.6,
+            thinking_config=ThinkingConfig(thinking_level=thinking_level),
+            # No response_mime_type / response_schema — free-form text output
+        )
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=contents,
+            config=config,
+        )
 
-            config = GenerateContentConfig(**config_kwargs)
-            response = client.models.generate_content(
-                model=MODEL,
-                contents=contents,
-                config=config,
-            )
+        raw = response.text or ""
 
-            raw = response.text or ""
-            result = json.loads(raw) if use_schema else _extract_json(raw)
+        # Log search queries used — useful for rubric auditing
+        candidate = response.candidates[0] if response.candidates else None
+        if candidate and getattr(candidate, "grounding_metadata", None):
+            queries = getattr(candidate.grounding_metadata, "web_search_queries", [])
+            if queries:
+                logger.info("  🔍 Search queries used: %s", queries)
 
-            # Log search queries used — useful for rubric auditing
-            candidate = response.candidates[0] if response.candidates else None
-            if candidate and getattr(candidate, "grounding_metadata", None):
-                queries = getattr(candidate.grounding_metadata, "web_search_queries", [])
-                if queries:
-                    logger.info("  🔍 Search queries used: %s", queries)
+        return raw, response
 
-            return result, response
-
-        except Exception as e:
-            if use_schema:
-                logger.warning(
-                    "  Search + JSON schema rejected by API (%s) — retrying without schema.", e
-                )
-                continue
-            logger.error("  ✗ Search grading error: %s", e)
-            return None, None
-
-    return None, None
+    except Exception as e:
+        logger.error("  ✗ Search grading error: %s", e)
+        return None, None
 
 
 # ---------------------------------------------------------------------------
-# Common post-processing
+# Common post-processing — token usage attachment
 # ---------------------------------------------------------------------------
 
-def _postprocess(result: dict, response: object, max_score: int) -> dict:
-    """
-    Clamps scores, back-fills legacy 'score' key, attaches token usage.
-    Called by all three code paths after a successful generate_content call.
-    """
-    # Clamp rubric_score and reflected_score
-    rubric_score = max(0, min(int(result.get("rubric_score", result.get("score", 0))), max_score))
-    reflected_score = max(0, min(int(result.get("reflected_score", rubric_score)), max_score))
-    result["rubric_score"] = rubric_score
-    result["reflected_score"] = reflected_score
-    # Keep legacy 'score' key pointing at reflected_score so downstream
-    # pipeline code (CostTracker, CSV writer, summary table) still works
-    # without changes.
-    result["score"] = reflected_score
-
-    # Clamp each criterion score against its own max_score
-    for c in result.get("criteria", []):
-        c_max = int(c.get("max_score", max_score))
-        c["score"] = max(0, min(int(c.get("score", 0)), c_max))
-
+def _attach_usage(result: dict, response: object) -> dict:
     usage = getattr(response, "usage_metadata", None)
     if usage:
         result["prompt_tokens"]     = getattr(usage, "prompt_token_count", 0)
         result["completion_tokens"] = getattr(usage, "response_token_count", 0)
         result["cached_tokens"]     = getattr(usage, "cached_content_token_count", 0)
         result["total_tokens"]      = getattr(usage, "total_token_count", 0)
-
     return result
 
 
@@ -355,38 +437,36 @@ def grade_submission(
         if cached_content_name:
             # ── Explicit-cache path ──────────────────────────────────────────
             # Rubric + system prompt already cached; only send per-student work.
-            # No search tool — response_mime_type=application/json is safe here.
+            # No search tool, no response_schema — free-form text output.
             contents = [
                 types.Content(
                     role="user",
                     parts=[types.Part(text=(
                         f"Grade this student submission.\n\n"
                         f"STUDENT NAME: {student_name}\n"
-                        f"SUBMISSION:\n{text}\n\n"
-                        + _fields_description(max_score)
+                        f"SUBMISSION:\n{text}"
                     ))],
                 )
             ]
             config = GenerateContentConfig(
-                response_mime_type="application/json",
-                response_schema=GradeResult,
                 temperature=0.6,
                 thinking_config=ThinkingConfig(thinking_level=thinking_level),
                 cached_content=cached_content_name,
+                # No response_mime_type / response_schema — free-form text
             )
             response = client.models.generate_content(
                 model=MODEL,
                 contents=contents,
                 config=config,
             )
-            result = json.loads(response.text or "{}")
+            raw = response.text or ""
 
         elif _is_gemini_model(MODEL):
             # ── Full-prompt path with Google Search grounding (Gemini only) ──
-            # system_instruction carries rubric + system prompt so the stable
-            # prefix is identical across all students — implicit caching fires
-            # automatically from the second call onward.
-            result, response = _grade_with_search(
+            # system_instruction carries rubric + system prompt identically
+            # across all students — implicit caching fires automatically from
+            # the second call onward.
+            raw, response = _grade_with_search(
                 client=client,
                 system_prompt=system_prompt,
                 rubric=rubric,
@@ -395,26 +475,25 @@ def grade_submission(
                 max_score=max_score,
                 thinking_level=thinking_level,
             )
-            if result is None:
+            if raw is None:
                 return None
 
         else:
             # ── Local model path (Ollama / custom endpoint) ──────────────────
             # No caching, no Google Search — plain generate_content call.
+            # No response_schema — free-form text output.
             contents = [
                 types.Content(
                     role="user",
                     parts=[types.Part(text=(
                         f"Grade this student submission.\n\n"
                         f"STUDENT NAME: {student_name}\n"
-                        f"SUBMISSION:\n{text}\n\n"
-                        + _fields_description(max_score)
+                        f"SUBMISSION:\n{text}"
                     ))],
                 )
             ]
             config = GenerateContentConfig(
                 system_instruction=f"{system_prompt}\n\nRUBRIC:\n{rubric}",
-                response_mime_type="application/json",
                 temperature=0.6,
             )
             response = client.models.generate_content(
@@ -422,17 +501,19 @@ def grade_submission(
                 contents=contents,
                 config=config,
             )
-            result = _extract_json(response.text or "{}")
+            raw = response.text or ""
 
-        # ── Common post-processing ───────────────────────────────────────────
-        result = _postprocess(result, response, max_score)
+        # ── Parse free-form text output into structured result dict ──────────
+        result = _parse_model_output(raw, max_score)
+        result = _attach_usage(result, response)
+
         logger.info(
-            "  ✓ Finished — %s: %d/%d (rubric: %d, reflected: %d)",
+            "  ✓ Finished — %s: %d/%d (rubric: %d, cdrp_flags: %d)",
             student_name,
             result["score"],
             max_score,
             result["rubric_score"],
-            result["reflected_score"],
+            result["cdrp_flag_count"],
         )
         return result
 
