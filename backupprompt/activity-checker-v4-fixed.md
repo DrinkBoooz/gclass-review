@@ -157,8 +157,8 @@ Numeric AI percentages are explicitly rejected by the CEIT Faculty Operational P
 (Dan's AI Detection Guide, Section 3) as statistically unreliable.
 
 PENALTY TIER TABLE:
-  Flags = 0                              → No penalty. No notice.
-  Flags >= 1, valid Transparency Report  → No penalty. Acknowledgement appended.
+   Flags = 0                              → No penalty. No notice.
+   Flags >= 1, valid Transparency Report  → No penalty. Acknowledgement appended.
    Flags 1–2, no Transparency Report      → WARNING ONLY. No score change. AI Usage Notice appended.
    Flags 3–4, no Transparency Report      → SCORE PENALTY. Reflected score capped at 60. AI Usage Notice appended.
    Flags 5+,  no Transparency Report      → SCORE PENALTY. Reflected score set to 0. AI Usage Notice appended.

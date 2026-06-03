@@ -587,6 +587,7 @@ def main() -> None:
             max_concurrency=1,    # Keep at 1 so the GPU focuses on one student
             base_delay=base_delay,
             output_dir=".",
+            cached_content_name=config.get("cached_content_name", ""),
         )
     )
 

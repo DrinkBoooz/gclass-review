@@ -221,7 +221,7 @@ def get_turned_in_submissions(service, course_id: str, coursework_id: str) -> li
             .list(
                 courseId=course_id,
                 courseWorkId=coursework_id,
-                # states=["TURNED_IN"], 
+                states=["TURNED_IN"],
                 pageToken=page_token,
                 fields="*"
             )
@@ -341,8 +341,16 @@ def extract_attachment_content(attachment: dict, drive_service) -> tuple[Optiona
             mime_type = file_meta.get("mimeType", "")
 
             if "google-apps" in mime_type:
+                # Docs are exported as HTML so that embedded hyperlinks
+                # ("click here" style anchors) are preserved and converted to
+                # inline [URL] markers. All other Google types stay as text/plain.
+                if mime_type == "application/vnd.google-apps.document":
+                    html_bytes = drive_service.files().export(
+                        fileId=file_id, mimeType="text/html"
+                    ).execute()
+                    html_str = html_bytes.decode("utf-8", errors="replace")
+                    return _html_to_text_with_links(html_str), "text/plain"
                 export_map = {
-                    "application/vnd.google-apps.document": "text/plain",
                     "application/vnd.google-apps.spreadsheet": "text/csv",
                     "application/vnd.google-apps.presentation": "text/plain",
                     "application/vnd.google.colaboratory": "text/plain",
@@ -368,6 +376,14 @@ def extract_attachment_content(attachment: dict, drive_service) -> tuple[Optiona
                             return "[PDF contains no extractable text (scanned/image-based)]", "application/pdf"
                         if image_count:
                             text = f"{text}\n\n[Embedded images detected: {image_count}]"
+                        # Extract clickable link annotations (e.g. "click here" hyperlinks)
+                        pdf_links = _extract_pdf_hyperlinks(content_bytes)
+                        if pdf_links:
+                            link_lines = "\n".join(
+                                f"[Hyperlink: {disp!r} → {url}]"
+                                for disp, url in pdf_links
+                            )
+                            text = text + "\n\n" + link_lines
                         return text, "application/pdf"
                     except Exception as e:
                         return f"[PDF read error: {e}]", "application/pdf"
@@ -390,7 +406,16 @@ def extract_attachment_content(attachment: dict, drive_service) -> tuple[Optiona
                             image_count = 0
                         full_text = [para.text for para in document.paragraphs]
                         text = "\n".join(full_text).strip()
-                        if not text:
+                        # Extract hyperlinks embedded in paragraphs via XML walk.
+                        # para.text silently drops <w:hyperlink> runs — we recover them.
+                        hyperlinks = _extract_docx_hyperlinks(document)
+                        if hyperlinks:
+                            link_lines = "\n".join(
+                                f"[Hyperlink: {disp!r} → {url}]"
+                                for disp, url in hyperlinks
+                            )
+                            text = text + "\n\n" + link_lines
+                        if not text.strip():
                             return (f"[DOCX contains no extractable text: {file_title}]", mime_type)
                         if image_count:
                             text = f"{text}\n\n[Embedded images detected: {image_count}]"
@@ -409,23 +434,94 @@ def extract_attachment_content(attachment: dict, drive_service) -> tuple[Optiona
             return f"[Binary/non-text attachment: {file_title}]", "text/plain"
 
     # --- Link attachment ---
+    # A "link" attachment may be a plain URL, a Google Drive link, or a YouTube
+    # link submitted via the "Add link" button rather than "Add Drive file".
+    # We detect each case and handle it appropriately.
     link = attachment.get("link")
     if link:
-        url = link.get("url", "")
-        title = link.get("title", url)
-        logger.info("  Link attachment: '%s' → %s", title, url)
+        url   = (link.get("url") or "").strip()
+        title = (link.get("title") or "").strip() or url or "(untitled link)"
+
+        if not url:
+            logger.warning("  Link attachment has empty URL (title=%r) — skipping.", title)
+            return f"[Link Submission: {title} | URL: (none)]", "text/plain"
+
+        logger.info("  Link attachment: %r → %s", title, url)
+
+        # ── YouTube URL submitted as a plain link ────────────────────────────
+        yt_id = _extract_youtube_id(url)
+        if yt_id:
+            yt_url = f"https://www.youtube.com/watch?v={yt_id}"
+            logger.info("  Resolved link as YouTube video: %s", yt_url)
+            return f"[YouTube Submission: {title} | URL: {yt_url}]", "text/plain"
+
+        # ── Google Forms URL — content not fetchable via API ─────────────────
+        if _GFORMS_RE.search(url):
+            logger.info("  Link is a Google Form — responses not accessible via API.")
+            return f"[Google Form Submission: {title} | URL: {url}]", "text/plain"
+
+        # ── Google Drive / Docs / Sheets / Slides URL ────────────────────────
+        # When a student uses "Add link" to share a Google Doc (instead of
+        # "Add Drive file"), the attachment is a link, not a driveFile.
+        # We detect the file ID and fetch the content exactly as we would for
+        # a driveFile attachment.
+        gdrive_id = _extract_gdrive_id(url)
+        if gdrive_id and drive_service is not None:
+            logger.info(
+                "  Link URL contains Drive file ID %s — fetching content.", gdrive_id
+            )
+            try:
+                file_meta = drive_service.files().get(
+                    fileId=gdrive_id, fields="mimeType,name"
+                ).execute()
+                mime_type  = file_meta.get("mimeType", "")
+                file_title = file_meta.get("name", title)
+
+                if "google-apps" in mime_type:
+                    export_map = {
+                        "application/vnd.google-apps.document":     "text/plain",
+                        "application/vnd.google-apps.spreadsheet":  "text/csv",
+                        "application/vnd.google-apps.presentation": "text/plain",
+                        "application/vnd.google.colaboratory":      "text/plain",
+                    }
+                    content_bytes = drive_service.files().export(
+                        fileId=gdrive_id,
+                        mimeType=export_map.get(mime_type, "text/plain"),
+                    ).execute()
+                    text = content_bytes.decode("utf-8", errors="replace")
+                    logger.info(
+                        "  Fetched Drive file via link: %r (%s, %d chars)",
+                        file_title, mime_type, len(text),
+                    )
+                    return text, "text/plain"
+
+                # Binary Drive file (PDF, docx uploaded to Drive, etc.)
+                # Re-use the same driveFile branch by constructing a synthetic
+                # driveFile attachment dict and recursing once.
+                synthetic = {"driveFile": {"id": gdrive_id, "title": file_title}}
+                return extract_attachment_content(synthetic, drive_service)
+
+            except HttpError as e:
+                logger.warning(
+                    "  Could not fetch Drive file %s from link URL (%s): %s",
+                    gdrive_id, url, e,
+                )
+                # Fall through to plain-URL fallback below
+
+        # ── Plain external URL ───────────────────────────────────────────────
         return f"[Link Submission: {title} | URL: {url}]", "text/plain"
 
-    # --- YouTube attachment ---
+    # --- YouTube attachment (submitted via the dedicated YouTube picker) -----
     youtube = attachment.get("youTubeVideo")
     if youtube:
-        url = f"https://www.youtube.com/watch?v={youtube.get('id', '')}"
-        title = youtube.get("title", url)
-        logger.info("  YouTube attachment: '%s'", title)
+        yt_id  = youtube.get("id", "")
+        url    = f"https://www.youtube.com/watch?v={yt_id}" if yt_id else ""
+        title  = (youtube.get("title") or "").strip() or url or "(untitled video)"
+        logger.info("  YouTube attachment: %r", title)
         return f"[YouTube Submission: {title} | URL: {url}]", "text/plain"
 
     logger.warning("  Unrecognized attachment type: %s", list(attachment.keys()))
-    return f"[Unrecognized attachment type]", "text/plain"
+    return "[Unrecognized attachment type]", "text/plain"
 
 
 def collect_submission_content(submission: dict, drive_service) -> str:
@@ -509,6 +605,45 @@ def _is_text_mime(mime: str) -> bool:
     )
 
 
+# ---------------------------------------------------------------------------
+# URL helpers — extract Drive file IDs and YouTube video IDs from raw URLs
+# ---------------------------------------------------------------------------
+
+# Matches Google Drive / Docs / Sheets / Slides / Colab file IDs inside URLs.
+# Groups: (docs_id, drive_path_id, drive_query_id, colab_id)
+_GDRIVE_ID_RE = re.compile(
+    r'(?:'
+    r'docs\.google\.com/(?:document|spreadsheets|presentation|forms)/d/([a-zA-Z0-9_-]{20,})'
+    r'|drive\.google\.com/file/d/([a-zA-Z0-9_-]{20,})'
+    r'|drive\.google\.com/(?:open|uc)\?(?:[^&\s]*&)*id=([a-zA-Z0-9_-]{20,})'
+    r'|colab\.research\.google\.com/drive/([a-zA-Z0-9_-]{20,})'
+    r')',
+)
+
+# Matches YouTube video IDs in watch?v=, youtu.be/, and embed/ URLs.
+_YOUTUBE_ID_RE = re.compile(
+    r'(?:youtube\.com/(?:watch\?(?:[^&\s]*&)*v=|embed/)|youtu\.be/)([a-zA-Z0-9_-]{11})'
+)
+
+# Google Forms URLs — we recognise them but cannot fetch their responses.
+_GFORMS_RE = re.compile(r'docs\.google\.com/forms/d/')
+
+
+def _extract_gdrive_id(url: str) -> Optional[str]:
+    """Return the Drive file ID embedded in *url*, or None if not a Drive URL."""
+    m = _GDRIVE_ID_RE.search(url)
+    if not m:
+        return None
+    return next((g for g in m.groups() if g), None)
+
+
+def _extract_youtube_id(url: str) -> Optional[str]:
+    """Return the YouTube video ID embedded in *url*, or None."""
+    m = _YOUTUBE_ID_RE.search(url)
+    return m.group(1) if m else None
+
+
+
 def _ocr_pdf_bytes(content_bytes: bytes) -> str:
     if pytesseract is None or convert_from_bytes is None or Image is None:
         logger.warning("OCR skipped: pytesseract/pdf2image/Pillow not installed.")
@@ -571,6 +706,287 @@ def _count_pdf_images(content_bytes: bytes) -> int:
         except Exception:
             continue
     return count
+
+
+# ---------------------------------------------------------------------------
+# Hyperlink extraction helpers
+# ---------------------------------------------------------------------------
+
+def _extract_docx_hyperlinks(document) -> list[tuple[str, str]]:
+    """
+    Walks all paragraph XML trees to find <w:hyperlink> elements with external
+    relationship IDs. Returns a list of (display_text, url) tuples.
+    Plain text export (para.text) silently drops these — this recovers them.
+    """
+    if docx is None:
+        return []
+    try:
+        from docx.oxml.ns import qn as _qn
+    except Exception:
+        return []
+
+    results: list[tuple[str, str]] = []
+    seen_urls: set[str] = set()
+
+    for para in document.paragraphs:
+        for hl in para._element.findall(".//" + _qn("w:hyperlink")):
+            r_id = hl.get(_qn("r:id"))
+            if not r_id:
+                continue
+            try:
+                url = document.part.target_ref(r_id)
+            except Exception:
+                continue
+            if not url or url in seen_urls:
+                continue
+            seen_urls.add(url)
+            texts = [t.text for t in hl.findall(".//" + _qn("w:t")) if t.text]
+            display = "".join(texts).strip() or url
+            results.append((display, url))
+
+    return results
+
+
+def _extract_pdf_hyperlinks(content_bytes: bytes) -> list[tuple[str, str]]:
+    """
+    Reads all /Link annotations from every page of a PDF and returns a list of
+    (display_text, url) tuples. The display text is the annotation rectangle's
+    approximate text region (best-effort); falls back to the URL itself.
+    """
+    results: list[tuple[str, str]] = []
+    seen_urls: set[str] = set()
+    try:
+        reader = pypdf.PdfReader(BytesIO(content_bytes))
+        for page in reader.pages:
+            if "/Annots" not in page:
+                continue
+            for annot_ref in page["/Annots"]:
+                try:
+                    annot = annot_ref.get_object()
+                except Exception:
+                    continue
+                if annot.get("/Subtype") != "/Link":
+                    continue
+                action = annot.get("/A", {})
+                url = ""
+                try:
+                    url = str(action.get("/URI", "") or "").strip()
+                except Exception:
+                    pass
+                if not url or url in seen_urls:
+                    continue
+                seen_urls.add(url)
+                # Use the URL itself as display text (PDF doesn't reliably expose it)
+                results.append((url, url))
+    except Exception as e:
+        logger.debug("PDF hyperlink extraction error: %s", e)
+    return results
+
+
+def _html_to_text_with_links(html: str) -> str:
+    """
+    Converts HTML (from Google Docs export) to plain text, replacing
+    <a href="URL">TEXT</a> with "TEXT [URL]" so hyperlinks are preserved.
+    """
+    # Replace each anchor tag with display + URL
+    def _sub(m: re.Match) -> str:
+        url     = m.group(1).strip()
+        display = re.sub(r"<[^>]+>", "", m.group(2)).strip()
+        if not display or display.lower() in ("click here", "here", "link", "this", "view"):
+            return f"{display} [{url}]".strip()
+        return f"{display} [{url}]"
+
+    _HREF_RE = re.compile(
+        r'<a\s[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)</a>',
+        re.IGNORECASE | re.DOTALL,
+    )
+    text = _HREF_RE.sub(_sub, html)
+    # Strip remaining HTML tags
+    text = re.sub(r"<[^>]+>", "", text)
+    # Collapse whitespace runs
+    text = re.sub(r"\n\s*\n", "\n\n", text).strip()
+    return text
+
+
+# ---------------------------------------------------------------------------
+# Group Work Detection
+# ---------------------------------------------------------------------------
+
+#: Keywords (case-insensitive) in the coursework title or description that
+#: strongly suggest the assignment is a group/team activity.
+_GROUP_KEYWORDS_RE = re.compile(
+    r'\b(group|team|pair|collab|pangkat|grupo|partnership|tandem)\b',
+    re.IGNORECASE,
+)
+
+
+def detect_group_submissions(
+    submissions: list[dict],
+    coursework_title: str = "",
+    coursework_description: str = "",
+) -> dict[str, dict]:
+    """
+    Identifies group-work submissions by detecting shared Drive file IDs across
+    multiple students, then enriches each submission with group metadata.
+
+    Detection uses two signals (both zero extra API calls):
+
+    PRIMARY — Shared Drive file:
+        If two or more submissions reference the exact same driveFile ID, those
+        students submitted the same document and are in a group.
+
+    SECONDARY — Coursework title / description keyword:
+        If the assignment title or description contains group-work keywords
+        ("group", "team", "pair", "pangkat", "grupo", etc.), every submission is
+        flagged as group work even when Drive IDs cannot confirm it.
+
+    Args:
+        submissions:             Full list of studentSubmission dicts from the API.
+        coursework_title:        The assignment title string (optional).
+        coursework_description:  The assignment description string (optional).
+
+    Returns:
+        A dict keyed by submission ID, each value being a metadata dict:
+            {
+                "is_group_work": bool,
+                "group_members": list[str],   # submission IDs of all members
+                "shared_file_id": str | None, # Drive file ID if detected
+                "detection_method": str,      # "shared_file" | "keyword" | "none"
+            }
+        Submissions with no group signal get is_group_work=False.
+    """
+    # ── Signal 1: keyword in coursework title / description ──────────────────
+    keyword_signal = bool(
+        _GROUP_KEYWORDS_RE.search(coursework_title or "")
+        or _GROUP_KEYWORDS_RE.search(coursework_description or "")
+    )
+    if keyword_signal:
+        logger.info(
+            "Group-work keyword detected in coursework title/description: %r",
+            coursework_title,
+        )
+
+    # ── Signal 2: shared driveFile IDs ───────────────────────────────────────
+    # Build a map: file_id → [submission_id, ...]
+    file_id_to_submissions: dict[str, list[str]] = {}
+
+    for sub in submissions:
+        sub_id      = sub.get("id", "")
+        attachments = (sub.get("assignmentSubmission") or {}).get("attachments", [])
+        for att in attachments:
+            drive_file = att.get("driveFile")
+            if drive_file:
+                fid = drive_file.get("id")
+                if fid:
+                    file_id_to_submissions.setdefault(fid, []).append(sub_id)
+                continue
+            # Also detect Drive IDs embedded in link URLs
+            link_url = (att.get("link") or {}).get("url", "")
+            if link_url:
+                fid = _extract_gdrive_id(link_url)
+                if fid:
+                    file_id_to_submissions.setdefault(fid, []).append(sub_id)
+
+    # Shared files: any file_id referenced by more than one submission
+    shared: dict[str, list[str]] = {
+        fid: sids
+        for fid, sids in file_id_to_submissions.items()
+        if len(sids) > 1
+    }
+
+    if shared:
+        logger.info(
+            "Shared Drive files detected across submissions: %s",
+            {fid: sids for fid, sids in shared.items()},
+        )
+
+    # ── Build result metadata per submission ──────────────────────────────────
+    result: dict[str, dict] = {}
+
+    for sub in submissions:
+        sub_id = sub.get("id", "")
+
+        # Find if this submission is part of any shared-file group
+        matched_file_id: Optional[str] = None
+        group_members:   list[str]     = []
+
+        for fid, sids in shared.items():
+            if sub_id in sids:
+                matched_file_id = fid
+                group_members   = sids
+                break
+
+        if matched_file_id:
+            result[sub_id] = {
+                "is_group_work":    True,
+                "group_members":    group_members,
+                "shared_file_id":   matched_file_id,
+                "detection_method": "shared_file",
+            }
+        elif keyword_signal:
+            # Keyword signal only — we know it's group work but can't name members
+            result[sub_id] = {
+                "is_group_work":    True,
+                "group_members":    [],
+                "shared_file_id":   None,
+                "detection_method": "keyword",
+            }
+        else:
+            result[sub_id] = {
+                "is_group_work":    False,
+                "group_members":    [],
+                "shared_file_id":   None,
+                "detection_method": "none",
+            }
+
+    return result
+
+
+def build_group_context_note(
+    submission_id: str,
+    group_map: dict[str, dict],
+    profile_map: dict[str, dict],
+) -> str:
+    """
+    Returns a plain-text note to prepend to a submission's content so the
+    grader knows it is group work and who the members are.
+
+    Args:
+        submission_id: The current student's submission ID.
+        group_map:     Output of detect_group_submissions().
+        profile_map:   Dict mapping submission_id → {"name": str, "email": str}.
+
+    Returns:
+        A non-empty string if this is group work, else "".
+    """
+    meta = group_map.get(submission_id, {})
+    if not meta.get("is_group_work"):
+        return ""
+
+    method  = meta.get("detection_method", "none")
+    members = meta.get("group_members", [])
+
+    if method == "shared_file" and members:
+        names = []
+        for sid in members:
+            p = profile_map.get(sid)
+            names.append(p["name"] if p else sid)
+        members_str = ", ".join(names)
+        return (
+            f"[GROUP WORK \u2014 Shared submission]\n"
+            f"This document was submitted by multiple students: {members_str}.\n"
+            f"Grade this submission as a GROUP output. All listed members receive "
+            f"the same grade unless the rubric specifies otherwise.\n"
+        )
+
+    if method == "keyword":
+        return (
+            "[GROUP WORK \u2014 Assignment title indicates a group/team activity]\n"
+            "Grade this submission as a GROUP output. All members of this group "
+            "receive the same grade unless the rubric specifies otherwise.\n"
+        )
+
+    return ""
 
 
 # ---------------------------------------------------------------------------
@@ -715,7 +1131,6 @@ def save_feedback_to_csv(
     fieldnames = [
         "Student Name",
         "Score",
-        "RubricScore",
         "Max Score",
         "Percentage",
         "Feedback",
@@ -746,16 +1161,15 @@ def save_feedback_to_csv(
                 try:
                     pct = (
                         f"{(float(score) / float(max_s) * 100):.2f}%"
-                        if score != "" and str(score).strip() != "-" and max_s
+                        if score != "" and max_s
                         else ""
                     )
-                except (TypeError, ZeroDivisionError, ValueError):
+                except (TypeError, ZeroDivisionError):
                     pct = ""
 
                 writer.writerow({
                     "Student Name": r.get("name", ""),
                     "Score":        score,
-                    "RubricScore":  r.get("rubric_score", ""),
                     "Max Score":    max_s,
                     "Percentage":   pct,
                     "Feedback":     r.get("feedback", ""),

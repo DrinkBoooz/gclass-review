@@ -423,6 +423,7 @@ def grade_submission_batch(
     students_data: list[dict],
     max_score: int,
     thinking_level: str = "minimal",
+    cached_content_name: str = "",
 ) -> list[dict]:
     """
     Batches multiple student submissions into a single Gemini prompt using text delimiters,
@@ -432,16 +433,30 @@ def grade_submission_batch(
     batch_prompt = (
         "You are receiving a batch of student submissions. You must grade EACH student "
         "individually according to the system prompt rules.\n\n"
-        "CRITICAL INSTRUCTION:\n"
-        "You must output your complete, fully-formatted response (starting with "
-        "<AI_DETECTION_EVIDENCE_LOG> and ending with ===STUDENT FEEDBACK===) for "
-        "EACH student. Separate each student's grading block with this exact delimiter:\n"
-        "@@@STUDENT:[Student Name]@@@\n\n"
-        "Do not output anything outside of these blocks.\n\n"
+        "CRITICAL OUTPUT INSTRUCTION:\n"
+        "For EACH student, output your complete, fully-formatted grading block. "
+        "The grading block starts with <AI_DETECTION_EVIDENCE_LOG> and ends after "
+        "the ===STUDENT FEEDBACK=== prose paragraphs (the feedback prose is the last "
+        "content — ===STUDENT FEEDBACK=== is a section header, not the final line).\n\n"
+        "DELIMITER RULE: You MUST begin each student's grading block with this exact "
+        "line on its own line, using the student's actual submission ID:\n"
+        "  @@@STUDENT:<submission_id>@@@\n\n"
+        "Example (structure only — use the real IDs below):\n"
+        "  @@@STUDENT:abc123xyz@@@\n"
+        "  <AI_DETECTION_EVIDENCE_LOG>\n"
+        "  ...\n"
+        "  </AI_DETECTION_EVIDENCE_LOG>\n"
+        "  ===GRADE BREAKDOWN===\n"
+        "  ...\n"
+        "  ===STUDENT FEEDBACK===\n"
+        "  [feedback prose here]\n\n"
+        "Do not output anything before the first @@@STUDENT:...@@@ delimiter.\n"
+        "Do not output anything between grading blocks except the next delimiter.\n\n"
+        "SUBMISSIONS TO GRADE:\n\n"
     )
 
     for student in students_data:
-        batch_prompt += f"@@@STUDENT:{student['profile']['name']}@@@\n"
+        batch_prompt += f"@@@STUDENT:{student['submission_id']}@@@\n"
         batch_prompt += f"SUBMISSION:\n{student['content']}\n\n"
 
     contents = [
@@ -452,12 +467,19 @@ def grade_submission_batch(
     ]
 
     try:
-        config = GenerateContentConfig(
-            system_instruction=f"{system_prompt}\n\nRUBRIC:\n{rubric}",
-            temperature=0.6,
-            thinking_config=ThinkingConfig(thinking_level=thinking_level),
-            # No response_mime_type / response_schema — free-form text output
-        )
+        if cached_content_name:
+            config = GenerateContentConfig(
+                temperature=0.6,
+                thinking_config=ThinkingConfig(thinking_level=thinking_level),
+                cached_content=cached_content_name,
+            )
+        else:
+            config = GenerateContentConfig(
+                system_instruction=f"{system_prompt}\n\nRUBRIC:\n{rubric}",
+                temperature=0.6,
+                thinking_config=ThinkingConfig(thinking_level=thinking_level),
+                # No response_mime_type / response_schema — free-form text output
+            )
 
         response = client.models.generate_content(
             model=MODEL,
@@ -476,18 +498,29 @@ def grade_submission_batch(
             if not part.strip():
                 continue
 
-            # Find the end of the name delimiter
+            # Find the end of the submission id delimiter
             name_end = part.find("@@@")
             if name_end == -1:
                 continue
 
-            student_name = part[:name_end].strip()
+            extracted_id = part[:name_end].strip()
             student_output = part[name_end + 3:].strip()
 
             # 3. Pass the extracted block into the existing parsing logic
             parsed_result = _parse_model_output(student_output, max_score)
-            parsed_result["name"] = student_name
+            parsed_result["submission_id"] = extracted_id
             results.append(parsed_result)
+
+        # Warn for any student whose block was not found in the model output
+        returned_ids = {r["submission_id"] for r in results}
+        for student in students_data:
+            if student["submission_id"] not in returned_ids:
+                logger.warning(
+                    "  ⚠ Batch parse: no grading block found for submission_id=%s (%s). "
+                    "This student will be marked failed_parsing and should be retried.",
+                    student["submission_id"],
+                    student.get("profile", {}).get("name", "?"),
+                )
 
         # 4. Handle usage tracking (applied to the first result as a proxy for the batch)
         if results:
