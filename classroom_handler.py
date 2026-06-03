@@ -158,9 +158,23 @@ def authenticate_classroom(credentials_file: str, token_file: str):
                     )
                     creds = flow.run_console()
 
-        with open(token_file, "w") as f:
+        # Write the token file with owner-only permissions (0o600).
+        # The default umask on most Linux systems produces 0o644, making the
+        # refresh token readable by any local user — a full Classroom+Drive
+        # write-access exposure. The opener= argument bypasses the process umask.
+        def _owner_only(path: str, flags: int) -> int:
+            return os.open(path, flags, 0o600)
+
+        with open(token_file, "w", opener=_owner_only) as f:
             f.write(creds.to_json())
-        logger.info("OAuth token saved to '%s'.", token_file)
+        # Belt-and-suspenders: explicitly chmod in case the file already existed
+        # with wrong permissions from a previous run (open() with opener= only
+        # sets perms on *creation*, not on truncation of an existing file).
+        try:
+            os.chmod(token_file, 0o600)
+        except OSError:
+            pass  # non-POSIX filesystem (e.g. Windows FAT) — skip silently
+        logger.info("OAuth token saved to '%s' (permissions: 0600).", token_file)
 
     service = build("classroom", "v1", credentials=creds)
     logger.info("Google Classroom API client initialized.")
@@ -177,9 +191,21 @@ def authenticate_classroom(credentials_file: str, token_file: str):
     wait=wait_exponential(multiplier=1, min=2, max=30),
     reraise=True,
 )
-def get_turned_in_submissions(service, course_id: str, coursework_id: str) -> list[dict]:
+def get_all_submissions(service, course_id: str, coursework_id: str) -> list[dict]:
     """
-    Fetches all student submissions with state "TURNED_IN" for a given assignment.
+    Fetches ALL student submissions for a given assignment, across every state.
+
+    The Google Classroom API creates a studentSubmission resource for every
+    enrolled student — including those who never interacted with the assignment.
+    Removing the states filter ensures the pipeline sees the complete class
+    record and can apply the correct routing per state:
+
+        TURNED_IN              → grade normally
+        CREATED  + attachment  → grade with -5 not-turned-in penalty
+        CREATED  + no content  → Not Submitted
+        NEW      (no action)   → Not Submitted
+        RETURNED               → skip, preserve status
+        RECLAIMED_BY_STUDENT   → skip, preserve status
 
     Handles pagination automatically. Retries ONLY on HTTP 429 (rate limit)
     with exponential backoff — permanent errors (403, 404, 500) are raised
@@ -192,13 +218,13 @@ def get_turned_in_submissions(service, course_id: str, coursework_id: str) -> li
 
     Returns:
         List of submission resource dicts, each containing keys such as
-        'id', 'userId', 'assignmentSubmission' (with 'attachments'), etc.
+        'id', 'userId', 'state', 'assignmentSubmission' (with 'attachments'), etc.
 
     Raises:
         HttpError: On any API error (429 is retried; all others raised immediately).
     """
     logger.info(
-        "Fetching TURNED_IN submissions — course=%s, coursework=%s",
+        "Fetching all submissions (all states) — course=%s, coursework=%s",
         course_id, coursework_id,
     )
 
@@ -221,7 +247,7 @@ def get_turned_in_submissions(service, course_id: str, coursework_id: str) -> li
             .list(
                 courseId=course_id,
                 courseWorkId=coursework_id,
-                states=["TURNED_IN"],
+                # No states filter — returns a record for every enrolled student.
                 pageToken=page_token,
                 fields="*"
             )
@@ -268,8 +294,21 @@ def get_turned_in_submissions(service, course_id: str, coursework_id: str) -> li
         if not page_token:
             break
 
-    logger.info("Total TURNED_IN submissions retrieved: %d", len(submissions))
+    # Log a breakdown by state for quick diagnostics
+    from collections import Counter
+    state_counts = Counter(s.get("state", "UNKNOWN") for s in submissions)
+    logger.info(
+        "All submissions retrieved: %d total — %s",
+        len(submissions),
+        ", ".join(f"{st}={cnt}" for st, cnt in sorted(state_counts.items())),
+    )
     return submissions
+
+
+# Backward-compatible alias so any external callers are not broken.
+def get_turned_in_submissions(service, course_id: str, coursework_id: str) -> list[dict]:
+    """Deprecated alias for get_all_submissions(). Use get_all_submissions() directly."""
+    return get_all_submissions(service, course_id, coursework_id)
 
 
 def get_student_profile(service, course_id: str, user_id: str) -> dict:
@@ -379,8 +418,12 @@ def extract_attachment_content(attachment: dict, drive_service) -> tuple[Optiona
                         # Extract clickable link annotations (e.g. "click here" hyperlinks)
                         pdf_links = _extract_pdf_hyperlinks(content_bytes)
                         if pdf_links:
+                            # When display text == URL (PDF can't expose anchor text),
+                            # emit compact [URL: ...] to avoid duplicating the URL string
+                            # and wasting Gemini prompt tokens (~50 tokens per link saved).
                             link_lines = "\n".join(
-                                f"[Hyperlink: {disp!r} → {url}]"
+                                f"[URL: {url}]" if disp == url
+                                else f"[Hyperlink: {disp!r} → {url}]"
                                 for disp, url in pdf_links
                             )
                             text = text + "\n\n" + link_lines
@@ -1131,6 +1174,7 @@ def save_feedback_to_csv(
     fieldnames = [
         "Student Name",
         "Score",
+        "RubricScore",   # Pre-penalty rubric score — distinct from final Score
         "Max Score",
         "Percentage",
         "Feedback",
@@ -1170,6 +1214,7 @@ def save_feedback_to_csv(
                 writer.writerow({
                     "Student Name": r.get("name", ""),
                     "Score":        score,
+                    "RubricScore":  r.get("rubric_score", ""),
                     "Max Score":    max_s,
                     "Percentage":   pct,
                     "Feedback":     r.get("feedback", ""),

@@ -49,7 +49,7 @@ from rich.panel import Panel
 from classroom_handler import (
     authenticate_classroom,
     build_drive_service,
-    get_turned_in_submissions,
+    get_all_submissions,
     get_student_profile,
     collect_submission_content,
     post_draft_grade,
@@ -62,6 +62,7 @@ from gemini_grader import (
     build_cached_prefix,
     grade_submission,
 )
+from roster import load_roster
 
 # ---------------------------------------------------------------------------
 # Logging Setup
@@ -125,8 +126,17 @@ def load_and_validate_env() -> dict:
         )
         sys.exit(1)
 
+    # Store the raw API key in a private key that is NEVER logged.
+    # The public "gemini_api_key" slot holds a redacted sentinel so that any
+    # accidental logger.debug("config=%s", config) cannot leak the secret.
+    _raw_api_key = os.getenv("GEMINI_API_KEY", "")
+    fuzzy_env = os.getenv("FUZZY_MATCHING", "").strip().lower()
+    fuzzy_matching = fuzzy_env in ("1", "true", "yes", "y", "on")
     return {
-        "gemini_api_key":    os.getenv("GEMINI_API_KEY"),
+        # ── Secret — never log this dict directly ──────────────────────────
+        "_gemini_api_key":   _raw_api_key,          # real key, private slot
+        "gemini_api_key":    "[REDACTED]",           # safe sentinel for logging
+        # ── Non-secret config ──────────────────────────────────────────────
         "credentials_file":  os.getenv("GOOGLE_CREDENTIALS_FILE"),
         "token_file":        os.getenv("GOOGLE_TOKEN_FILE"),
         "course_id":         os.getenv("COURSE_ID"),
@@ -135,6 +145,12 @@ def load_and_validate_env() -> dict:
         "assignment_title":  os.getenv("ASSIGNMENT_TITLE"),
         "rubric_file":       os.getenv("RUBRIC_FILE", "rubric.md"),
         "system_prompt_file": os.getenv("SYSTEM_PROMPT_FILE", "activity-checker-v4-fixed.md"),
+        # ROSTER_FILES: optional comma-separated paths, e.g.:
+        #   ROSTER_FILES=roster/BSIT-3A.xlsx,roster/BSIT-3B.csv
+        # Leave blank to fall back to submission-owner name detection.
+        "roster_files":      os.getenv("ROSTER_FILES", ""),
+        # Fuzzy matching can be toggled via CLI menu or --fuzzy-matching.
+        "fuzzy_matching":    fuzzy_matching,
     }
 
 
@@ -190,6 +206,11 @@ def parse_args() -> argparse.Namespace:
         "--csv-only",
         action="store_true",
         help="Skip posting grades and write the CSV only.",
+    )
+    parser.add_argument(
+        "--fuzzy-matching",
+        action="store_true",
+        help="Enable fuzzy matching for roster name resolution (default: off).",
     )
     parser.add_argument(
         "--verbose",
@@ -350,6 +371,7 @@ def run_cli_menu(args: argparse.Namespace, config: dict) -> None:
     args.limit = _prompt_int("Limit submissions", args.limit)
     args.delay = _prompt_float("Delay between Gemini calls (seconds)", args.delay)
     args.thinking = _prompt_choice("Thinking level (minimal/low/medium/high)", ["minimal", "low", "medium", "high"], args.thinking)
+    config["fuzzy_matching"] = _prompt_bool("Enable fuzzy matching [default: off]", False)
 
     config["rubric_file"] = _select_rubric_file(config.get("rubric_file", "rubric.md"))
     config["system_prompt_file"] = "activity-checker-v4-fixed.md"
@@ -394,16 +416,25 @@ def print_summary(
         score_str = pct_str = "—"
         score_style = "white"
 
-        if status in ("graded", "dry_run"):
+        if status in ("graded", "graded_locally_only", "success", "dry_run"):
             score = r.get("score", 0)  # defensive get avoids KeyError
-            pct = (score / max_score) * 100
+            try:
+                pct = (float(score) / max_score) * 100
+            except (TypeError, ZeroDivisionError):
+                pct = 0.0
             score_str = f"{score}/{max_score}"
             pct_str = f"{pct:.1f}%"
             score_style = "green" if pct >= 75 else ("yellow" if pct >= 50 else "red")
             label = "[blue]✓ Dry Run[/blue]" if dry_run else "[green]✓ Graded[/green]"
             graded += 1
-        elif status == "skipped_no_content":
-            label = "[yellow]⚠ No Content[/yellow]"
+        elif status in ("Not Submitted", "skipped_no_content"):
+            label = "[yellow]⚠ Not Submitted[/yellow]"
+            skipped += 1
+        elif status == "Returned":
+            label = "[dim]↩ Returned[/dim]"
+            skipped += 1
+        elif status == "Reclaimed":
+            label = "[dim]↩ Reclaimed[/dim]"
             skipped += 1
         elif status == "grading_failed":
             label = "[red]✗ AI Failed[/red]"
@@ -474,6 +505,8 @@ def main() -> None:
     # ── 1. Load config ────────────────────────────────────────────────────────
     config = load_and_validate_env()
     config["csv_only"] = args.csv_only
+    if args.fuzzy_matching:
+        config["fuzzy_matching"] = True
 
     if args.menu:
         run_cli_menu(args, config)
@@ -496,7 +529,7 @@ def main() -> None:
 
     # ── 3. Initialize Gemini ──────────────────────────────────────────────────
     console.print("[bold]Step 2:[/bold] Initializing Gemini API client...")
-    gemini_client = build_gemini_client(api_key=config["gemini_api_key"])
+    gemini_client = build_gemini_client(api_key=config["_gemini_api_key"])
     console.print(f"  [green]✓[/green] Gemini client ready (thinking={args.thinking}).\n")
 
     # ── 4. Load rubric ────────────────────────────────────────────────────────
@@ -519,10 +552,34 @@ def main() -> None:
     else:
         console.print("  [yellow]![/yellow] Cached prefix not available; using full prompts.\n")
 
+    # ── 3d. Load class roster (optional) ─────────────────────────────────────
+    roster: list[dict] = []
+    roster_files_raw = config.get("roster_files", "").strip()
+    if roster_files_raw:
+        roster_paths = [p.strip() for p in roster_files_raw.split(",") if p.strip()]
+        if roster_paths:
+            console.print("[bold]Step 3d:[/bold] Loading class roster...")
+            try:
+                roster = load_roster(roster_paths)
+                console.print(
+                    f"  [green]✓[/green] Roster loaded: [bold]{len(roster)}[/bold] student(s) "
+                    f"from {len(roster_paths)} file(s).\n"
+                )
+            except Exception as e:
+                console.print(
+                    f"  [yellow]⚠ Roster load failed:[/yellow] {e}\n"
+                    "  Proceeding without roster — group detection falls back to submission owner.\n"
+                )
+    else:
+        console.print(
+            "[dim]Step 3d: No ROSTER_FILES configured — "
+            "group detection uses submission owner name only.[/dim]\n"
+        )
+
     # ── 5. Fetch submissions ──────────────────────────────────────────────────
-    console.print("[bold]Step 4:[/bold] Fetching TURNED_IN submissions from Classroom...")
+    console.print("[bold]Step 4:[/bold] Fetching all submissions from Classroom (all states)...")
     try:
-        submissions = get_turned_in_submissions(
+        submissions = get_all_submissions(
             service=classroom_service,
             course_id=config["course_id"],
             coursework_id=config["coursework_id"],
@@ -544,7 +601,7 @@ def main() -> None:
             logger.warning("Could not fetch coursework title: %s", e)
 
     if not submissions:
-        console.print("[yellow]No TURNED_IN submissions found. Nothing to grade.[/yellow]")
+        console.print("[yellow]No submissions found for this assignment. Nothing to grade.[/yellow]")
         sys.exit(0)
 
     if args.limit:
@@ -554,42 +611,45 @@ def main() -> None:
         )
 
     console.print(
-        f"  [green]✓[/green] Found [bold]{len(submissions)}[/bold] submission(s) to grade.\n"
+        f"  [green]✓[/green] Found [bold]{len(submissions)}[/bold] enrolled student record(s).\n"
     )
 
-    # ── 6. Grade each submission ──────────────────────────────────────────────
-    console.print(f"[bold]Step 5:[/bold] Grading {len(submissions)} submission(s)...\n")
-
-    results: list[dict] = []
-    start_time = datetime.now()
-
-    # ── 6. Grade each submission (Async Local Queue) ──────────────────────
+    # ── 6. Grade each submission (Async Local Queue) ──────────────────────────
     console.print(f"[bold]Step 5:[/bold] Grading {len(submissions)} submission(s)...\n")
     start_time = datetime.now()
 
     # Propagate CLI overrides into the config for the local pipeline
     config["thinking_level"] = args.thinking
 
-    # Force dry_run to True to skip Classroom 403 errors and reduce overhead
-    # We will rely on the CSV file for the final grades.
     is_local = "localhost" in os.getenv("AI_ENDPOINT", "") or os.getenv("GEMINI_API_KEY", "") == "gemini-3.5-flash"
     base_delay = 1.0 if is_local else args.delay
 
     run_dry = args.dry_run or args.csv_only
-    results, cost_report = asyncio.run(
-        run_local_queue(
-            submissions=submissions,
-            config=config,
-            classroom_service=classroom_service,
-            drive_service=drive_service,
-            gemini_client=gemini_client,
-            dry_run=run_dry,
-            max_concurrency=1,    # Keep at 1 so the GPU focuses on one student
-            base_delay=base_delay,
-            output_dir=".",
-            cached_content_name=config.get("cached_content_name", ""),
+    results: list[dict] = []
+    try:
+        results, cost_report = asyncio.run(
+            run_local_queue(
+                submissions=submissions,
+                config=config,
+                classroom_service=classroom_service,
+                drive_service=drive_service,
+                gemini_client=gemini_client,
+                dry_run=run_dry,
+                max_concurrency=1,    # Keep at 1 so the GPU focuses on one student
+                base_delay=base_delay,
+                output_dir=".",
+                cached_content_name=config.get("cached_content_name", ""),
+                roster=roster,
+            )
         )
-    )
+    except KeyboardInterrupt:
+        console.print(
+            "\n[bold yellow]⚠ Interrupted by user (Ctrl+C).[/bold yellow] "
+            "Flushing any results collected so far..."
+        )
+        cost_report = "(interrupted — partial run)"
+        # results may be partially populated if the queue managed to yield
+        # some completed batches before the interrupt; fall through to CSV save.
 
     console.print(f"[dim]⏱ Pipeline completed in {(datetime.now() - start_time).total_seconds():.1f}s[/dim]\n")
 

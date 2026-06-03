@@ -8,10 +8,16 @@ Local async grading pipeline implementing Priority C:
 
 Key design:
   Content pre-screening happens ONCE in run_local_queue before any batching.
-  Only students with usable content are batched and sent to Gemini.
-  Students with no content are resolved immediately as "No attachments submitted."
-  and never consume a Gemini API slot. This guarantees every batch sent to
-  Gemini is packed to batch_size with real submissions.
+  Submissions are routed by state FIRST:
+    - RETURNED / RECLAIMED_BY_STUDENT → immediate result, no Gemini call
+    - CREATED + no content            → "Not Submitted", no Gemini call
+    - NEW / TURNED_IN + no content    → "Not Submitted", no Gemini call
+    - CREATED + has content           → ready for grading + not_turned_in_penalty flag
+    - TURNED_IN + has content         → ready for grading normally
+
+  Only students whose content passes pre-screening are batched and sent to
+  Gemini. This guarantees every batch sent to Gemini is packed to batch_size
+  with real submissions and never wastes an API slot on empty records.
 """
 import asyncio
 import json
@@ -88,8 +94,8 @@ class CostTracker:
 
     @property
     def estimated_cost_usd(self):
-        # gemini-1.5-flash pricing (approx): $0.0375 / 1M input, $0.15 / 1M output
-        return (self.total_prompt * 0.0375 + self.total_completion * 0.15) / 1_000_000
+        # gemini-3-flash-preview pricing: $0.50 / 1M input, $3.00 / 1M output
+        return (self.total_prompt * 0.50 + self.total_completion * 3.00) / 1_000_000
 
     def report(self) -> str:
         return (
@@ -122,9 +128,21 @@ class DeadLetterQueue:
             return
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         dl_path = self.filepath / f"dead_letter_queue_{ts}.json"
-        with open(dl_path, "w", encoding="utf-8") as f:
-            json.dump(self.items, f, indent=2)
-        logger.info("💀 Dead-letter queue flushed to %s", dl_path)
+        try:
+            with open(dl_path, "w", encoding="utf-8") as f:
+                json.dump(self.items, f, indent=2)
+            logger.info("💀 Dead-letter queue flushed to %s", dl_path)
+        except OSError as e:
+            # Output directory is read-only (container, CI, etc.) — log the
+            # full payload at ERROR level so the data is never silently lost.
+            logger.error(
+                "💀 Dead-letter queue could not be written to %s (%s). "
+                "Logging %d failed submission(s) inline so they are not lost:\n%s",
+                dl_path,
+                e,
+                len(self.items),
+                json.dumps(self.items, indent=2),
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -154,9 +172,17 @@ def _prescreeen_submissions(
     roster: list[dict],
 ) -> tuple[list[dict], list[dict]]:
     """
-    Fetches profiles and content for every submission, resolves group membership
-    from document content using fuzzy roster matching, detects duplicate group
-    submissions, and splits into ready/empty lists.
+    Fetches profiles and content for every submission, routes by submission
+    state, resolves group membership from document content using fuzzy roster
+    matching, detects duplicate group submissions, and splits into ready/empty.
+
+    State routing (applied before any content fetch for terminal states):
+        RETURNED / RECLAIMED_BY_STUDENT → immediate result, no grading
+        TURNED_IN + no content          → "Not Submitted"
+        CREATED   + no content          → "Not Submitted"
+        NEW       (no interaction)      → "Not Submitted"
+        CREATED   + has content         → grade + not_turned_in_penalty flag
+        TURNED_IN + has content         → grade normally
     """
     ready: list[dict] = []
     empty: list[dict] = []
@@ -165,32 +191,63 @@ def _prescreeen_submissions(
     for idx, submission in enumerate(submissions, start=1):
         submission_id = submission.get("id")
         user_id       = submission.get("userId")
+        state         = submission.get("state", "")
 
         profile = get_student_profile(classroom_service, config["course_id"], user_id)
         name    = profile["name"]
 
-        logger.info("  [%d/%d] Fetching content for %s...", idx, total, name)
+        # ── Terminal states: RETURNED / RECLAIMED ────────────────────────────
+        # These submissions already have instructor interaction; skip grading.
+        if state in ("RETURNED", "RECLAIMED_BY_STUDENT"):
+            display_status = "Returned" if state == "RETURNED" else "Reclaimed"
+            logger.info(
+                "  [%d/%d] %s: state=%s — skipping grading (%s).",
+                idx, total, name, state, display_status,
+            )
+            empty.append({
+                "status":       display_status,
+                "name":         name,
+                "email":        profile["email"],
+                "max_score":    config["max_score"],
+                "score":        "",
+                "rubric_score": "",
+                "feedback":     "",
+            })
+            continue
+
+        # ── Fetch content for all other states ───────────────────────────────
+        logger.info("  [%d/%d] Fetching content for %s (state=%s)...", idx, total, name, state)
         student_content = collect_submission_content(submission, drive_service)
         text = student_content.get("text", "")
 
         if _is_empty_content(text):
-            logger.warning("  No usable content for %s -- marked as no-submission.", name)
+            logger.warning("  No usable content for %s -- marked as Not Submitted.", name)
             empty.append({
-                "status":       "No attachments submitted.",
+                "status":       "Not Submitted",
                 "name":         name,
                 "email":        profile["email"],
                 "max_score":    config["max_score"],
-                "score":        "-",
-                "rubric_score": "-",
+                "score":        "",
+                "rubric_score": "",
                 "feedback":     "",
             })
             continue
+
+        # CREATED state with content: student has an attachment but never
+        # clicked "Turn In". Grade it but flag for a -5 point penalty.
+        not_turned_in = (state == "CREATED")
+        if not_turned_in:
+            logger.warning(
+                "  %s: state=CREATED but has attachment — will grade with -5 not-turned-in penalty.",
+                name,
+            )
 
         # Group / individual resolution from document content
         group_info = resolve_group_from_content(
             text=text,
             roster=roster,
             submission_owner_name=name,
+            fuzzy_enabled=config.get("fuzzy_matching", True),
         )
         logger.info(
             "  %s -> %s (%s)",
@@ -200,12 +257,13 @@ def _prescreeen_submissions(
         )
 
         ready.append({
-            "submission_id": submission_id,
-            "profile":       profile,
-            "content":       text,
-            "late":          submission.get("late", False),
-            "group_info":    group_info,
-            "dup_penalty":   False,
+            "submission_id":       submission_id,
+            "profile":             profile,
+            "content":             text,
+            "late":                submission.get("late", False),
+            "group_info":          group_info,
+            "dup_penalty":         False,
+            "not_turned_in_penalty": not_turned_in,
         })
 
     # Duplicate submission detection (needs all ready students at once)
@@ -314,36 +372,54 @@ async def process_batch(
 
         if not stu_result:
             logger.warning(
-                "  ⚠ No grading block found for %s (id=%s) — model skipped this student.",
+                "  ⚠ No grading block found for %s (id=%s) — model skipped this student. "
+                "Marked parse_failed; consider retrying this submission individually.",
                 profile["name"], submission_id,
             )
             final_results.append({
-                "status":       "grading_failed",
+                "status":       "parse_failed",   # distinct from grading_failed (API error)
                 "name":         profile["name"],
                 "email":        profile["email"],
                 "max_score":    config["max_score"],
                 "score":        "",
                 "rubric_score": "",
-                "feedback":     "",
+                "feedback":     (
+                    "[Grading note: The AI model returned output for this batch but "
+                    "did not include a grading block for this student. "
+                    "This is a model output parsing failure, not a student submission issue. "
+                    "Please re-run with --limit 1 targeting this student to retry.]"
+                ),
             })
             continue
 
-        # Late penalty
-        if student["late"]:
-            original_score = stu_result.get("score", 0) or 0
-            stu_result["score"] = max(0, original_score - 10)
-            stu_result["feedback"] = (
-                (stu_result.get("feedback") or "") +
-                "\n\n[System Note: A 10-point penalty was applied for a late submission.]"
-            )
+        # ── Consolidate all applicable deductions before modifying the score ──
+        # Applying each deduction independently re-reads the already-reduced
+        # score, which produces correct arithmetic but adds three separate
+        # "-5 Points" notes on a 0/100 submission — confusing for students.
+        # Accumulate here; apply once.
+        total_deduction = 0
+        deduction_notes: list[str] = []
 
-        # Duplicate group submission penalty (-5 pts, applied after late deduction)
+        if student["late"]:
+            total_deduction += 5
+            deduction_notes.append("Late submission (-5 pts)")
+
+        if student.get("not_turned_in_penalty"):
+            total_deduction += 5
+            deduction_notes.append("Not turned in — has attachment but was not submitted (-5 pts)")
+
         if student.get("dup_penalty"):
+            total_deduction += 5
+            deduction_notes.append("Multiple group members submitted individually (-5 pts)")
+
+        if total_deduction > 0:
             original_score = stu_result.get("score", 0) or 0
-            stu_result["score"] = max(0, original_score - 5)
+            stu_result["score"] = max(0, original_score - total_deduction)
+            notes_text = "\n  • ".join(deduction_notes)
             stu_result["feedback"] = (
-                (stu_result.get("feedback") or "") +
-                "\n\n[System Note: Multiple Members Submitted, -5 Points]"
+                (stu_result.get("feedback") or "")
+                + f"\n\n[Instructor note — deduction(s) applied:\n  • {notes_text}\n"
+                f"  Score before deduction: {original_score} → Final: {stu_result['score']}]"
             )
 
         # Post grade
@@ -390,12 +466,13 @@ async def run_local_queue(
     Orchestrates the full grading pipeline:
 
     1. Pre-screen all submissions synchronously — fetch profiles + content,
-       split into `ready` (has content) and `empty` (no submission).
-    2. `empty` students are resolved immediately with status
-       "No attachments submitted." and never touch Gemini.
+       route by state (RETURNED/RECLAIMED bypass grading; CREATED+attachment
+       gets a not-turned-in penalty flag), split into `ready` and `empty`.
+    2. `empty` students (Not Submitted / Returned / Reclaimed) are resolved
+       immediately and never touch Gemini.
     3. `ready` students are packed into dense batches of `batch_size`
        (no empty slots) and processed concurrently up to `max_concurrency`.
-    4. Results from both groups are merged and returned in original order.
+    4. Results from both groups are merged and returned.
     """
     rate_limiter = AdaptiveRateLimiter(base_delay=base_delay, max_concurrency=max_concurrency)
     cost_tracker = CostTracker()

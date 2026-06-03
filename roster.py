@@ -446,23 +446,50 @@ def _parse_raw_names(raw: str) -> list[str]:
 # Fuzzy matching
 # ---------------------------------------------------------------------------
 
+def _match_names_exact(
+    candidate_names: list[str],
+    roster: list[dict],
+) -> list[dict]:
+    """Exact match on normalized names (no fuzzy scoring)."""
+    roster_map = {r.get("normalized", ""): r for r in roster if r.get("normalized")}
+    matched: list[dict] = []
+    seen_norms: set[str] = set()
+
+    for name in candidate_names:
+        norm = _normalize_name(name)
+        if not norm:
+            continue
+        rec = roster_map.get(norm)
+        if rec and rec["normalized"] not in seen_norms:
+            seen_norms.add(rec["normalized"])
+            matched.append(rec)
+            logger.debug("  Name exact match: %r → %r", name, rec["roster_name"])
+
+    return matched
+
+
 def match_names_to_roster(
     candidate_names: list[str],
     roster: list[dict],
     threshold: int = FUZZY_THRESHOLD,
+    fuzzy_enabled: bool = True,
 ) -> list[dict]:
     """
-    Fuzzy-matches a list of extracted name strings against the loaded roster.
+    Matches extracted name strings against the loaded roster.
 
     Args:
         candidate_names: Name strings extracted from the document.
         roster:          Loaded roster records from load_roster().
         threshold:       Minimum WRatio score to accept a match (0–100).
+        fuzzy_enabled:   Whether to use fuzzy matching; if False, exact match.
 
     Returns:
         List of matched roster records (deduplicated). Unmatched names are
         logged as warnings but do not raise exceptions.
     """
+    if not fuzzy_enabled:
+        return _match_names_exact(candidate_names, roster)
+
     if not _RAPIDFUZZ_AVAILABLE:
         logger.warning("rapidfuzz unavailable — returning empty match list.")
         return []
@@ -509,6 +536,7 @@ def resolve_group_from_content(
     roster: list[dict],
     submission_owner_name: str = "",
     threshold: int = FUZZY_THRESHOLD,
+    fuzzy_enabled: bool = True,
 ) -> dict:
     """
     Full pipeline: extract names from document, match to roster, determine
@@ -531,25 +559,27 @@ def resolve_group_from_content(
         }
     """
     candidates, label_type = extract_names_from_text(text)
-    matched = match_names_to_roster(candidates, roster, threshold)
+    matched = match_names_to_roster(candidates, roster, threshold, fuzzy_enabled)
 
-    # Unresolved = candidates that produced no match
+    # Unresolved = candidates that produced no match above the threshold.
+    # Guard against rapidfuzz being unavailable: fuzz_process is None in that
+    # case, and calling None.extractOne() raises AttributeError, crashing the
+    # entire pre-screening phase for all students.
     matched_norms = {r["normalized"] for r in matched}
-    unresolved = [
-        c for c in candidates
-        if _normalize_name(c) not in matched_norms
-        and fuzz_process.extractOne(
-            _normalize_name(c),
-            [r["normalized"] for r in roster],
-            scorer=fuzz.WRatio,
-        ) is None or (
-            fuzz_process.extractOne(
-                _normalize_name(c),
-                [r["normalized"] for r in roster],
-                scorer=fuzz.WRatio,
-            ) or (None, 0, 0)
-        )[1] < threshold
-    ]
+    if not fuzzy_enabled or not _RAPIDFUZZ_AVAILABLE or not roster:
+        # Without fuzzy matching we cannot verify scores — treat every
+        # unmatched candidate as unresolved.
+        unresolved = [c for c in candidates if _normalize_name(c) not in matched_norms]
+    else:
+        roster_norms = [r["normalized"] for r in roster]
+        unresolved = []
+        for c in candidates:
+            norm = _normalize_name(c)
+            if norm in matched_norms:
+                continue
+            result = fuzz_process.extractOne(norm, roster_norms, scorer=fuzz.WRatio)
+            if result is None or result[1] < threshold:
+                unresolved.append(c)
 
     # Determine group vs individual
     if label_type == "group" and len(matched) >= 2:

@@ -17,7 +17,10 @@ logger = logging.getLogger(__name__)
 
 # Resolve model once at import time so build_cached_prefix and grade_submission
 # always reference the same model string — a mismatch causes a 400 from the API.
-MODEL = os.getenv("GEMINI_MODEL") or os.getenv("AI_MODEL") or "gemini-3-flash-preview"
+# NOTE: "gemini-3-flash-preview" was a placeholder that never existed on the API.
+#       The correct current default is "gemini-2.5-flash-preview-05-20".
+#       Override via GEMINI_MODEL or AI_MODEL env vars.
+MODEL = os.getenv("GEMINI_MODEL") or os.getenv("AI_MODEL") or "gemini-2.5-flash-preview-05-20"
 
 
 def _is_gemini_model(model: str) -> bool:
@@ -85,8 +88,27 @@ def load_prompt_file(file_path: str, default_text: str) -> str:
 
 
 def build_gemini_client(api_key: str) -> genai.Client:
-    logger.info("Gemini client initialized (model: %s).", MODEL)
-    return genai.Client(api_key=api_key)
+    client = genai.Client(api_key=api_key)
+    # Validate that MODEL resolves to a real API model at startup.
+    # A wrong model string causes every grade_submission call to silently fail
+    # with a 404/400 and return None, producing a full batch of "grading_failed"
+    # rows with no clear diagnosis. Catching it here gives a clean error message.
+    if _is_gemini_model(MODEL):
+        try:
+            client.models.get(model=MODEL)
+            logger.info("Gemini client initialized — model '%s' confirmed.", MODEL)
+        except Exception as e:
+            raise RuntimeError(
+                f"[ConfigurationError] Model '{MODEL}' was not found on the Gemini API.\n"
+                f"  API response: {e}\n"
+                f"  Set GEMINI_MODEL in your .env to a valid model name, e.g.:\n"
+                f"    GEMINI_MODEL=gemini-2.5-flash-preview-05-20\n"
+                f"  Run 'python -c \"from google import genai; c=genai.Client(api_key=\\\"KEY\\\"); "
+                f"[print(m.name) for m in c.models.list()]\"' to list available models."
+            ) from e
+    else:
+        logger.info("Gemini client initialized (local/Ollama model: %s).", MODEL)
+    return client
 
 
 def load_system_prompt(system_prompt_file: str) -> str:
@@ -181,7 +203,8 @@ def _count_cdrp_flags(raw: str) -> int:
          These are the only phrases that passed all three CDRP steps.
       2. If the AI Usage Notice template is present but has zero Category
          entries (malformed — model wrote the notice but omitted flag blocks),
-         treat as 1 confirmed flag so the warning tier still fires.
+         return 0 — a notice without evidence must never trigger a penalty tier.
+         Log a warning so the instructor knows the model output was malformed.
       3. If no AI Usage Notice at all → 0 confirmed flags.
     """
     # Extract student feedback section (everything after ===STUDENT FEEDBACK===)
@@ -203,8 +226,17 @@ def _count_cdrp_flags(raw: str) -> int:
     if confirmed:
         return len(confirmed)
 
-    # Notice present but flag entries missing (malformed output) — treat as 1
-    return 1
+    # Notice template present but no Category flag entries found.
+    # This is a malformed model output — the notice block was emitted but the
+    # required FLAG FORMAT entries were omitted. Returning 1 here would fire a
+    # warning penalty against a student with zero verified evidence, which is a
+    # false positive. Return 0 and log so the instructor can review.
+    logger.warning(
+        "CDRP: AI Usage Notice template detected but no Category A–E flag entries "
+        "found. This is a malformed model output — returning 0 flags. "
+        "Instructor should review the raw_output for this submission manually."
+    )
+    return 0
 
 
 def _apply_penalty_tiers(rubric_score: float, cdrp_flags: int,
